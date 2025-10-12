@@ -1,0 +1,622 @@
+# Uzbek (uz) — formal "Siz", Latin
+msgid ""
+msgstr ""
+"Project-Id-Version: car_rent_aggregator\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-10 00:00+0000\n"
+"PO-Revision-Date: 2025-10-10 00:00+0000\n"
+"Last-Translator: WEBadiko\n"
+"Language-Team: Uzbek\n"
+"Language: uz\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: apps/bookings/admin.py
+msgid "(нет данных)"
+msgstr "(maʼlumot yoʻq)"
+
+#: apps/bookings/admin.py apps/bookings/models.py
+msgid "Клиент"
+msgstr "Mijoz"
+
+#: apps/bookings/models.py apps/cars/models.py apps/partners/models.py apps/partners/models.py
+msgid "Партнёр"
+msgstr "Hamkor"
+
+#: apps/bookings/models.py
+msgid "Телефон клиента"
+msgstr "Mijoz telefoni"
+
+#: apps/bookings/models.py
+msgid "Аренда с"
+msgstr "Ijara boshlanishi"
+
+#: apps/bookings/models.py
+msgid "Аренда по"
+msgstr "Ijara tugashi"
+
+#: apps/bookings/models.py
+msgid "Расчётная стоимость, UZS"
+msgstr "Hisobiy narx, UZS"
+
+#: apps/bookings/models.py
+msgid "Статус брони"
+msgstr "Bron holati"
+
+#: apps/bookings/models.py
+msgid "Оплата брони"
+msgstr "Bron toʻlovi"
+
+#: apps/bookings/models.py apps/cars/models.py apps/partners/models.py apps/payments/models.py apps/users/models.py
+msgid "Создано"
+msgstr "Yaratildi"
+
+#: apps/bookings/models.py apps/cars/models.py apps/partners/models.py apps/payments/models.py apps/users/models.py
+msgid "Обновлено"
+msgstr "Yangilandi"
+
+#: apps/bookings/models.py
+msgid "Бронирование"
+msgstr "Bron"
+
+#: apps/bookings/models.py
+msgid "Бронирования"
+msgstr "Bronlar"
+
+#: apps/bookings/models.py apps/cars/models.py
+msgid "Дата 'Аренда по' должна быть больше даты 'Аренда с'."
+msgstr "“Ijara tugash” sanasi “Ijara boshlanish” sanasidan katta boʻlishi kerak."
+
+#: apps/bookings/models.py
+msgid "Предыдущая дата окончания"
+msgstr "Avvalgi tugash sanasi"
+
+#: apps/bookings/models.py
+msgid "Новая дата окончания"
+msgstr "Yangi tugash sanasi"
+
+#: apps/bookings/models.py
+msgid "Кол-во добавленных дней"
+msgstr "Qoʻshilgan kunlar soni"
+
+#: apps/bookings/models.py
+msgid "Стоимость продления, UZS"
+msgstr "Uzaytirish narxi, UZS"
+
+#: apps/bookings/models.py
+msgid "Комиссия/сервисный сбор, UZS"
+msgstr "Komissiya/xizmat haqi, UZS"
+
+#: apps/bookings/models.py apps/payments/models.py
+msgid "Валюта"
+msgstr "Valyuta"
+
+#: apps/bookings/models.py
+msgid "Статус продления"
+msgstr "Uzaytirish holati"
+
+#: apps/bookings/models.py
+msgid "Ожидает"
+msgstr "Kutilmoqda"
+
+#: apps/bookings/models.py
+msgid "Оплачено"
+msgstr "Toʻlangan"
+
+#: apps/bookings/models.py
+msgid "Отклонено"
+msgstr "Rad etildi"
+
+#: apps/bookings/models.py
+msgid "Идентификатор оплаты"
+msgstr "Toʻlov identifikatori"
+
+#: apps/bookings/models.py
+msgid "Продление брони"
+msgstr "Bronni uzaytirish"
+
+#: apps/bookings/models.py
+msgid "Продления брони"
+msgstr "Bronni uzaytirishlar"
+
+#: apps/bookings/api.py
+msgid "Автомобиль занят на выбранные даты."
+msgstr "Tanlangan sanalarda avtomobil band."
+
+#: apps/bookings/api.py
+msgid "На эти даты уже есть подтверждённая бронь."
+msgstr "Ushbu sanalarda tasdiqlangan bron allaqachon mavjud."
+
+#: apps/bookings/api.py
+msgid "Слот временно удерживается другим запросом, попробуйте позже."
+msgstr "Vaqt oraligʻi boshqa soʻrov tomonidan vaqtincha band. Keyinroq urinib koʻring."
+
+#: apps/bookings/api.py
+msgid "Нужно передать partner_tg_user_id или partner_username"
+msgstr "partner_tg_user_id yoki partner_username qiymatini yuborishingiz kerak"
+
+#: apps/bookings/api.py
+msgid "Нет прав подтверждать эту бронь."
+msgstr "Ushbu bronni tasdiqlash huquqingiz yoʻq."
+
+#: apps/bookings/api.py
+msgid "Бронь не в статусе ожидания."
+msgstr "Bron kutish holatida emas."
+
+#: apps/bookings/api.py
+msgid "Истекло время ожидания подтверждения."
+msgstr "Tasdiqlashni kutish vaqti tugadi."
+
+#: apps/bookings/api.py
+msgid "Авто уже занято на эти даты."
+msgstr "Ushbu sanalarda avtomobil allaqachon band."
+
+#: apps/bookings/api.py
+msgid "Есть другая подтверждённая бронь в этот период."
+msgstr "Ushbu davrda boshqa tasdiqlangan bron mavjud."
+
+#: apps/bookings/api.py
+msgid "Нет прав отклонять эту бронь."
+msgstr "Ushbu bronni rad etish huquqingiz yoʻq."
+
+#: apps/bookings/api.py
+msgid "Бронь уже обработана."
+msgstr "Bron allaqachon qayta ishlangan."
+
+#: apps/bookings/api.py
+msgid "Можно отменить только собственную бронь."
+msgstr "Faqat oʻzingizning broningizni bekor qilishingiz mumkin."
+
+#: apps/bookings/api.py
+msgid "Отмена невозможна: бронь уже обработана."
+msgstr "Bekor qilish imkonsiz: bron allaqachon qayta ishlangan."
+
+#: apps/cars/models.py
+msgid "Название автомобиля для клиента"
+msgstr "Mijoz uchun avtomobil nomi"
+
+#: apps/cars/models.py
+msgid "Напр.: Chevrolet Cobalt 2022"
+msgstr "Masalan: Chevrolet Cobalt 2022"
+
+#: apps/cars/models.py
+msgid "Марка автомобиля"
+msgstr "Avtomobil markasi"
+
+#: apps/cars/models.py
+msgid "Модель автомобиля"
+msgstr "Avtomobil modeli"
+
+#: apps/cars/models.py
+msgid "Год выпуска"
+msgstr "Ishlab chiqarilgan yil"
+
+#: apps/cars/models.py
+msgid "Класс авто"
+msgstr "Avto klassi"
+
+#: apps/cars/models.py
+msgid "Трансмиссия"
+msgstr "Transmissiya"
+
+#: apps/cars/models.py
+msgid "Пробег, км"
+msgstr "Yurgan masofa, km"
+
+#: apps/cars/models.py
+msgid "Объём двигателя, л"
+msgstr "Dvigatel hajmi, l"
+
+#: apps/cars/models.py
+msgid "Мощность, л.с."
+msgstr "Quvvat, ot kuchi"
+
+#: apps/cars/models.py
+msgid "Тип топлива"
+msgstr "Yoqilgʻi turi"
+
+#: apps/cars/models.py
+msgid "Расход, л/100 км"
+msgstr "Sarflanish, l/100 km"
+
+#: apps/cars/models.py
+msgid "Привод"
+msgstr "Uzatma (privod)"
+
+#: apps/cars/models.py
+msgid "Цвет"
+msgstr "Rang"
+
+#: apps/cars/models.py
+msgid "Страховка включена"
+msgstr "Sugʻurta kiritilgan"
+
+#: apps/cars/models.py
+msgid "Детское кресло"
+msgstr "Bola oʻrindigʻi"
+
+#: apps/cars/models.py
+msgid "Цена в будни, UZS"
+msgstr "Ish kunlari narxi, UZS"
+
+#: apps/cars/models.py
+msgid "Цена в выходные, UZS"
+msgstr "Dam olish kunlari narxi, UZS"
+
+#: apps/cars/models.py
+msgid "Диапазон залога"
+msgstr "Garov diapazoni"
+
+#: apps/cars/models.py
+msgid "Без залога"
+msgstr "Garovsiz"
+
+#: apps/cars/models.py
+msgid "Низкий залог"
+msgstr "Past garov"
+
+#: apps/cars/models.py
+msgid "Высокий залог"
+msgstr "Yuqori garov"
+
+#: apps/cars/models.py
+msgid "Сумма аванса, UZS"
+msgstr "Oldindan toʻlov summasi, UZS"
+
+#: apps/cars/models.py
+msgid "Если фиксированная сумма, иначе оставьте пустым"
+msgstr "Agar qatʼiy summa boʻlsa, aks holda boʻsh qoldiring"
+
+#: apps/cars/models.py
+msgid "Суточный лимит, км"
+msgstr "Kunlik limit, km"
+
+#: apps/cars/models.py
+msgid "Доставка авто возможна"
+msgstr "Avtomobilni yetkazib berish mumkin"
+
+#: apps/cars/models.py
+msgid "Автомобиль с водителем"
+msgstr "Haydovchi bilan avtomobil"
+
+#: apps/cars/models.py
+msgid "Telegram file_id обложки"
+msgstr "Telegram cover file_id"
+
+#: apps/cars/models.py
+msgid "Опубликован"
+msgstr "Eʼlon qilingan"
+
+#: apps/cars/models.py
+msgid "Автомобиль"
+msgstr "Avtomobil"
+
+#: apps/cars/models.py
+msgid "Автомобили"
+msgstr "Avtomobillar"
+
+#: apps/cars/models.py
+msgid "Календарь занятости"
+msgstr "Bandlik taqvimi"
+
+#: apps/cars/models.py
+msgid "Календарь занятости (авто)"
+msgstr "Bandlik taqvimi (avto)"
+
+#: apps/cars/models.py
+msgid "Занят с"
+msgstr "Band boshidan"
+
+#: apps/cars/models.py
+msgid "Занят по"
+msgstr "Band oxirigacha"
+
+#: apps/cars/models.py
+msgid "Занято"
+msgstr "Band"
+
+#: apps/cars/models.py
+msgid "Фото автомобиля"
+msgstr "Avtomobil fotosi"
+
+#: apps/cars/models.py
+msgid "Фото 1 (обложка)"
+msgstr "Foto 1 (muqova)"
+
+#: apps/cars/models.py
+msgid "Фото 2"
+msgstr "Foto 2"
+
+#: apps/cars/models.py
+msgid "Фото 3"
+msgstr "Foto 3"
+
+#: apps/cars/models.py
+msgid "Фото 4"
+msgstr "Foto 4"
+
+#: apps/partners/models.py
+msgid "Название партнёра"
+msgstr "Hamkor nomi"
+
+#: apps/partners/models.py
+msgid "Отображаемое название компании/ИП"
+msgstr "Kompaniya/YTT ko‘rsatiladigan nomi"
+
+#: apps/partners/models.py
+msgid "Телефон"
+msgstr "Telefon"
+
+#: apps/partners/models.py
+msgid "Email"
+msgstr "Email"
+
+#: apps/partners/models.py
+msgid "Статус"
+msgstr "Holat"
+
+#: apps/partners/models.py
+msgid "Партнёры"
+msgstr "Hamkorlar"
+
+#: apps/partners/models.py
+msgid "Telegram username"
+msgstr "Telegram username"
+
+#: apps/partners/models.py
+msgid "Без @. Например: webadiko"
+msgstr "@ belgisiz. Masalan: webadiko"
+
+#: apps/partners/models.py
+msgid "Telegram user id"
+msgstr "Telegram user id"
+
+#: apps/partners/models.py
+msgid "Роль"
+msgstr "Roli"
+
+#: apps/partners/models.py
+msgid "Пользователь партнёра"
+msgstr "Hamkor foydalanuvchisi"
+
+#: apps/partners/models.py
+msgid "Пользователи партнёров"
+msgstr "Hamkor foydalanuvchilari"
+
+#: apps/partners/models.py
+msgid "Админ-пользователь"
+msgstr "Admin foydalanuvchisi"
+
+#: apps/partners/models.py
+msgid "Связь админ-пользователь ↔ партнёр"
+msgstr "Admin foydalanuvchi ↔ hamkor bogʻlanishi"
+
+#: apps/partners/models.py
+msgid "Связи админ-пользователь ↔ партнёр"
+msgstr "Admin foydalanuvchi ↔ hamkor bogʻlanishlari"
+
+#: apps/partners/api.py
+msgid "Партнёрский пользователь с таким username не найден."
+msgstr "Ushbu username boʻyicha hamkor foydalanuvchisi topilmadi."
+
+#: apps/partners/api.py
+msgid "Этот username уже привязан к другому Telegram ID."
+msgstr "Ushbu username boshqa Telegram ID bilan allaqachon bogʻlangan."
+
+#: apps/common/choices.py
+msgid "Активен"
+msgstr "Faol"
+
+#: apps/common/choices.py
+msgid "Заблокирован"
+msgstr "Bloklangan"
+
+#: apps/common/choices.py
+msgid "Ожидает модерации"
+msgstr "Moderatsiya kutmoqda"
+
+#: apps/common/choices.py
+msgid "Владелец"
+msgstr "Ega"
+
+#: apps/common/choices.py
+msgid "Менеджер"
+msgstr "Menejer"
+
+#: apps/common/choices.py
+msgid "Эконом"
+msgstr "Iqtisod"
+
+#: apps/common/choices.py
+msgid "Комфорт"
+msgstr "Komfort"
+
+#: apps/common/choices.py
+msgid "Бизнес"
+msgstr "Biznes"
+
+#: apps/common/choices.py
+msgid "Премиум"
+msgstr "Premium"
+
+#: apps/common/choices.py
+msgid "Внедорожник"
+msgstr "Yoʻltanlamas"
+
+#: apps/common/choices.py
+msgid "Минивэн"
+msgstr "Miniven"
+
+#: apps/common/choices.py
+msgid "Автомат"
+msgstr "Avtomat"
+
+#: apps/common/choices.py
+msgid "Механика"
+msgstr "Mexanika"
+
+#: apps/common/choices.py
+msgid "Робот"
+msgstr "Robot"
+
+#: apps/common/choices.py
+msgid "Вариатор"
+msgstr "Variator"
+
+#: apps/common/choices.py
+msgid "Бензин"
+msgstr "Benzin"
+
+#: apps/common/choices.py
+msgid "Дизель"
+msgstr "Dizel"
+
+#: apps/common/choices.py
+msgid "Газ"
+msgstr "Gaz"
+
+#: apps/common/choices.py
+msgid "Гибрид"
+msgstr "Gibrid"
+
+#: apps/common/choices.py
+msgid "Электро"
+msgstr "Elektr"
+
+#: apps/common/choices.py
+msgid "Передний"
+msgstr "Oldingi"
+
+#: apps/common/choices.py
+msgid "Задний"
+msgstr "Orqa"
+
+#: apps/common/choices.py
+msgid "Полный"
+msgstr "Toʻliq"
+
+#: apps/common/choices.py
+msgid "Ожидает подтверждения"
+msgstr "Tasdiqlash kutilmoqda"
+
+#: apps/common/choices.py
+msgid "Подтверждена"
+msgstr "Tasdiqlandi"
+
+#: apps/common/choices.py
+msgid "Отклонена"
+msgstr "Rad etildi"
+
+#: apps/common/choices.py
+msgid "Истекло время ожидания"
+msgstr "Kutilish vaqti tugadi"
+
+#: apps/common/choices.py
+msgid "Отменено клиентом"
+msgstr "Mijoz bekor qildi"
+
+#: apps/common/choices.py
+msgid "Авто выдано"
+msgstr "Avto topshirildi"
+
+#: apps/common/choices.py
+msgid "Завершена"
+msgstr "Yakunlandi"
+
+#: apps/common/choices.py
+msgid "Не оплачено"
+msgstr "Toʻlanmagan"
+
+#: apps/common/choices.py
+msgid "Создан"
+msgstr "Yaratildi"
+
+#: apps/common/choices.py
+msgid "Ожидает оплаты"
+msgstr "Toʻlov kutilmoqda"
+
+#: apps/common/choices.py
+msgid "Оплачен"
+msgstr "Toʻlangan"
+
+#: apps/common/choices.py
+msgid "Ошибка оплаты"
+msgstr "Toʻlov xatosi"
+
+#: apps/common/choices.py
+msgid "Возврат"
+msgstr "Qaytarildi"
+
+#: apps/common/choices.py
+msgid "Click"
+msgstr "Click"
+
+#: apps/common/choices.py
+msgid "Payme"
+msgstr "Payme"
+
+#: apps/payments/models.py
+msgid "Провайдер"
+msgstr "Provayder"
+
+#: apps/payments/models.py
+msgid "Сумма, UZS"
+msgstr "Miqdor, UZS"
+
+#: apps/payments/models.py
+msgid "ID счёта/заказа"
+msgstr "Hisob/Buyurtma ID"
+
+#: apps/payments/models.py
+msgid "Ссылка на оплату"
+msgstr "Toʻlov havolasi"
+
+#: apps/payments/models.py
+msgid "Статус оплаты"
+msgstr "Toʻlov holati"
+
+#: apps/payments/models.py
+msgid "Сырой ответ провайдера"
+msgstr "Provayderning xom javobi"
+
+#: apps/payments/models.py
+msgid "Платёж"
+msgstr "Toʻlov"
+
+#: apps/payments/models.py
+msgid "Платежи"
+msgstr "Toʻlovlar"
+
+#: apps/users/models.py
+msgid "Номер, полученный через request_contact"
+msgstr "request_contact orqali olingan raqam"
+
+#: apps/users/models.py
+msgid "Имя"
+msgstr "Ism"
+
+#: apps/users/models.py
+msgid "Фамилия"
+msgstr "Familiya"
+
+#: apps/users/models.py
+msgid "Язык интерфейса"
+msgstr "Interfeys tili"
+
+#: apps/users/models.py
+msgid "Коды: uz/ru/en"
+msgstr "Kodlar: uz/ru/en"
+
+#: apps/users/models.py
+msgid "Пользователь бота"
+msgstr "Bot foydalanuvchisi"
+
+#: apps/users/models.py
+msgid "Пользователи бота"
+msgstr "Bot foydalanuvchilari"
+
+#: apps/payments/api.py
+msgid "Неверный провайдер оплаты."
+msgstr "Notoʻgʻri toʻlov provayderi."

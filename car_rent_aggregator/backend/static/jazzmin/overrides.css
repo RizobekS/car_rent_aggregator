@@ -1,0 +1,4 @@
+.card, .modal-content, .btn, .form-control {
+  border-radius: 12px !important;
+}
+.table th, .table td { vertical-align: middle; }

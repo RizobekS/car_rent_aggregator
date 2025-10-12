@@ -1,0 +1,710 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-10 09:32+0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+#: .\apps\audit\models.py:8
+msgid "Актор"
+msgstr ""
+
+#: .\apps\audit\models.py:8
+msgid "Напр.: client:123, partner:45, system"
+msgstr ""
+
+#: .\apps\audit\models.py:9
+msgid "Действие"
+msgstr ""
+
+#: .\apps\audit\models.py:9
+msgid "Напр.: booking.create, payment.paid"
+msgstr ""
+
+#: .\apps\audit\models.py:10
+msgid "Данные"
+msgstr ""
+
+#: .\apps\audit\models.py:11 .\apps\bookings\models.py:55
+#: .\apps\bookings\models.py:97 .\apps\cars\models.py:59
+#: .\apps\cars\models.py:83 .\apps\cars\models.py:106
+#: .\apps\partners\models.py:30 .\apps\partners\models.py:68
+#: .\apps\partners\models.py:99 .\apps\payments\models.py:38
+#: .\apps\users\models.py:30
+msgid "Создано"
+msgstr ""
+
+#: .\apps\audit\models.py:14
+msgid "Событие аудита"
+msgstr ""
+
+#: .\apps\audit\models.py:15
+msgid "События аудита"
+msgstr ""
+
+#: .\apps\bookings\admin.py:78
+msgid "(нет данных)"
+msgstr ""
+
+#: .\apps\bookings\admin.py:80 .\apps\bookings\models.py:26
+msgid "Клиент"
+msgstr ""
+
+#: .\apps\bookings\api.py:49 .\apps\bookings\models.py:70
+msgid "Дата 'Аренда по' должна быть больше даты 'Аренда с'."
+msgstr ""
+
+#: .\apps\bookings\api.py:66
+msgid "Автомобиль занят на выбранные даты."
+msgstr ""
+
+#: .\apps\bookings\api.py:73
+msgid "На эти даты уже есть подтверждённая бронь."
+msgstr ""
+
+#: .\apps\bookings\api.py:81
+msgid "Слот временно удерживается другим запросом, попробуйте позже."
+msgstr ""
+
+#: .\apps\bookings\api.py:163
+msgid "Нужно передать partner_tg_user_id или partner_username"
+msgstr ""
+
+#: .\apps\bookings\api.py:249
+msgid "Нет прав подтверждать эту бронь."
+msgstr ""
+
+#: .\apps\bookings\api.py:252
+msgid "Бронь не в статусе ожидания."
+msgstr ""
+
+#: .\apps\bookings\api.py:256
+msgid "Истекло время ожидания подтверждения."
+msgstr ""
+
+#: .\apps\bookings\api.py:260
+msgid "Авто уже занято на эти даты."
+msgstr ""
+
+#: .\apps\bookings\api.py:265
+msgid "Есть другая подтверждённая бронь в этот период."
+msgstr ""
+
+#: .\apps\bookings\api.py:287
+msgid "Нет прав отклонять эту бронь."
+msgstr ""
+
+#: .\apps\bookings\api.py:290
+msgid "Бронь уже обработана."
+msgstr ""
+
+#: .\apps\bookings\api.py:309
+msgid "Можно отменить только собственную бронь."
+msgstr ""
+
+#: .\apps\bookings\api.py:311
+msgid "Отмена невозможна: бронь уже обработана."
+msgstr ""
+
+#: .\apps\bookings\models.py:14 .\apps\cars\models.py:63
+#: .\apps\cars\models.py:77 .\apps\cars\models.py:101
+msgid "Автомобиль"
+msgstr ""
+
+#: .\apps\bookings\models.py:20 .\apps\cars\admin.py:131
+#: .\apps\cars\models.py:12 .\apps\partners\models.py:34
+#: .\apps\partners\models.py:46 .\apps\partners\models.py:96
+msgid "Партнёр"
+msgstr ""
+
+#: .\apps\bookings\models.py:30
+msgid "Телефон клиента"
+msgstr ""
+
+#: .\apps\bookings\models.py:32
+msgid "Аренда с"
+msgstr ""
+
+#: .\apps\bookings\models.py:33
+msgid "Аренда по"
+msgstr ""
+
+#: .\apps\bookings\models.py:36
+msgid "Расчётная стоимость, UZS"
+msgstr ""
+
+#: .\apps\bookings\models.py:42
+msgid "Статус брони"
+msgstr ""
+
+#: .\apps\bookings\models.py:49
+msgid "Оплата брони"
+msgstr ""
+
+#: .\apps\bookings\models.py:56 .\apps\cars\models.py:60
+#: .\apps\partners\models.py:31 .\apps\payments\models.py:39
+#: .\apps\users\models.py:31
+msgid "Обновлено"
+msgstr ""
+
+#: .\apps\bookings\models.py:59 .\apps\bookings\models.py:80
+#: .\apps\payments\models.py:12
+msgid "Бронирование"
+msgstr ""
+
+#: .\apps\bookings\models.py:60
+msgid "Бронирования"
+msgstr ""
+
+#: .\apps\bookings\models.py:84
+msgid "Предыдущая дата окончания"
+msgstr ""
+
+#: .\apps\bookings\models.py:85
+msgid "Новая дата окончания"
+msgstr ""
+
+#: .\apps\bookings\models.py:86
+msgid "Кол-во добавленных дней"
+msgstr ""
+
+#: .\apps\bookings\models.py:87
+msgid "Стоимость продления, UZS"
+msgstr ""
+
+#: .\apps\bookings\models.py:88
+msgid "Комиссия/сервисный сбор, UZS"
+msgstr ""
+
+#: .\apps\bookings\models.py:89 .\apps\payments\models.py:24
+msgid "Валюта"
+msgstr ""
+
+#: .\apps\bookings\models.py:91
+msgid "Статус продления"
+msgstr ""
+
+#: .\apps\bookings\models.py:93
+msgid "Ожидает"
+msgstr ""
+
+#: .\apps\bookings\models.py:93 .\apps\common\choices.py:51
+msgid "Оплачено"
+msgstr ""
+
+#: .\apps\bookings\models.py:93
+msgid "Отклонено"
+msgstr ""
+
+#: .\apps\bookings\models.py:96
+msgid "Идентификатор оплаты"
+msgstr ""
+
+#: .\apps\bookings\models.py:100
+msgid "Продление брони"
+msgstr ""
+
+#: .\apps\bookings\models.py:101
+msgid "Продления брони"
+msgstr ""
+
+#: .\apps\cars\admin.py:36 .\apps\cars\admin.py:37
+msgid "Фотографии"
+msgstr ""
+
+#: .\apps\cars\admin.py:51
+msgid "Общее"
+msgstr ""
+
+#: .\apps\cars\admin.py:54
+msgid "Технические данные"
+msgstr ""
+
+#: .\apps\cars\admin.py:61
+msgid "Условия и цены"
+msgstr ""
+
+#: .\apps\cars\admin.py:102
+msgid "У вас нет привязанных партнёров. Обратитесь к администратору."
+msgstr ""
+
+#: .\apps\cars\admin.py:108
+msgid "Нельзя выбрать этого партнёра."
+msgstr ""
+
+#: .\apps\cars\admin.py:111
+msgid "Нельзя менять владельца автомобиля."
+msgstr ""
+
+#: .\apps\cars\models.py:16
+msgid "Название автомобиля для клиента"
+msgstr ""
+
+#: .\apps\cars\models.py:17
+msgid "Напр.: Chevrolet Cobalt 2022"
+msgstr ""
+
+#: .\apps\cars\models.py:18
+msgid "Марка автомобиля"
+msgstr ""
+
+#: .\apps\cars\models.py:19
+msgid "Модель автомобиля"
+msgstr ""
+
+#: .\apps\cars\models.py:20
+msgid "Год выпуска"
+msgstr ""
+
+#: .\apps\cars\models.py:22
+msgid "Класс авто"
+msgstr ""
+
+#: .\apps\cars\models.py:23
+msgid "Трансмиссия"
+msgstr ""
+
+#: .\apps\cars\models.py:26
+msgid "Пробег, км"
+msgstr ""
+
+#: .\apps\cars\models.py:27
+msgid "Объём двигателя, л"
+msgstr ""
+
+#: .\apps\cars\models.py:29
+msgid "Мощность, л.с."
+msgstr ""
+
+#: .\apps\cars\models.py:30
+msgid "Тип топлива"
+msgstr ""
+
+#: .\apps\cars\models.py:32
+msgid "Расход, л/100 км"
+msgstr ""
+
+#: .\apps\cars\models.py:34
+msgid "Привод"
+msgstr ""
+
+#: .\apps\cars\models.py:36
+msgid "Цвет"
+msgstr ""
+
+#: .\apps\cars\models.py:37
+msgid "Страховка включена"
+msgstr ""
+
+#: .\apps\cars\models.py:38
+msgid "Детское кресло"
+msgstr ""
+
+#: .\apps\cars\models.py:41
+msgid "Цена в будни, UZS"
+msgstr ""
+
+#: .\apps\cars\models.py:42
+msgid "Цена в выходные, UZS"
+msgstr ""
+
+#: .\apps\cars\models.py:45
+msgid "Диапазон залога"
+msgstr ""
+
+#: .\apps\cars\models.py:46
+msgid "Без залога"
+msgstr ""
+
+#: .\apps\cars\models.py:46
+msgid "Низкий залог"
+msgstr ""
+
+#: .\apps\cars\models.py:46
+msgid "Высокий залог"
+msgstr ""
+
+#: .\apps\cars\models.py:49
+msgid "Сумма аванса, UZS"
+msgstr ""
+
+#: .\apps\cars\models.py:51
+msgid "Если фиксированная сумма, иначе оставьте пустым"
+msgstr ""
+
+#: .\apps\cars\models.py:52
+msgid "Суточный лимит, км"
+msgstr ""
+
+#: .\apps\cars\models.py:53
+msgid "Доставка авто возможна"
+msgstr ""
+
+#: .\apps\cars\models.py:54
+msgid "Автомобиль с водителем"
+msgstr ""
+
+#: .\apps\cars\models.py:56
+msgid "Telegram file_id обложки"
+msgstr ""
+
+#: .\apps\cars\models.py:57
+msgid "Опубликован"
+msgstr ""
+
+#: .\apps\cars\models.py:64
+msgid "Автомобили"
+msgstr ""
+
+#: .\apps\cars\models.py:79
+msgid "Занят с"
+msgstr ""
+
+#: .\apps\cars\models.py:80
+msgid "Занят по"
+msgstr ""
+
+#: .\apps\cars\models.py:81 .\apps\partners\models.py:25
+msgid "Статус"
+msgstr ""
+
+#: .\apps\cars\models.py:82
+msgid "Занято"
+msgstr ""
+
+#: .\apps\cars\models.py:86
+msgid "Календарь занятости"
+msgstr ""
+
+#: .\apps\cars\models.py:87
+msgid "Календарь занятости (авто)"
+msgstr ""
+
+#: .\apps\cars\models.py:93
+msgid "Дата 'Занят по' должна быть больше даты 'Занят с'."
+msgstr ""
+
+#: .\apps\cars\models.py:102
+msgid "Фото 1 (обложка)"
+msgstr ""
+
+#: .\apps\cars\models.py:103
+msgid "Фото 2"
+msgstr ""
+
+#: .\apps\cars\models.py:104
+msgid "Фото 3"
+msgstr ""
+
+#: .\apps\cars\models.py:105
+msgid "Фото 4"
+msgstr ""
+
+#: .\apps\cars\models.py:109 .\apps\cars\models.py:110
+msgid "Фото автомобиля"
+msgstr ""
+
+#: .\apps\common\choices.py:6 .\apps\partners\models.py:67
+msgid "Активен"
+msgstr ""
+
+#: .\apps\common\choices.py:7 .\apps\users\models.py:29
+msgid "Заблокирован"
+msgstr ""
+
+#: .\apps\common\choices.py:8
+msgid "Ожидает модерации"
+msgstr ""
+
+#: .\apps\common\choices.py:11
+msgid "Владелец"
+msgstr ""
+
+#: .\apps\common\choices.py:12
+msgid "Менеджер"
+msgstr ""
+
+#: .\apps\common\choices.py:15
+msgid "Эконом"
+msgstr ""
+
+#: .\apps\common\choices.py:16
+msgid "Комфорт"
+msgstr ""
+
+#: .\apps\common\choices.py:17
+msgid "Бизнес"
+msgstr ""
+
+#: .\apps\common\choices.py:18
+msgid "Премиум"
+msgstr ""
+
+#: .\apps\common\choices.py:19
+msgid "Внедорожник"
+msgstr ""
+
+#: .\apps\common\choices.py:20
+msgid "Минивэн"
+msgstr ""
+
+#: .\apps\common\choices.py:23
+msgid "Автомат"
+msgstr ""
+
+#: .\apps\common\choices.py:24
+msgid "Механика"
+msgstr ""
+
+#: .\apps\common\choices.py:25
+msgid "Робот"
+msgstr ""
+
+#: .\apps\common\choices.py:26
+msgid "Вариатор"
+msgstr ""
+
+#: .\apps\common\choices.py:29
+msgid "Бензин"
+msgstr ""
+
+#: .\apps\common\choices.py:30
+msgid "Дизель"
+msgstr ""
+
+#: .\apps\common\choices.py:31
+msgid "Газ"
+msgstr ""
+
+#: .\apps\common\choices.py:32
+msgid "Гибрид"
+msgstr ""
+
+#: .\apps\common\choices.py:33
+msgid "Электро"
+msgstr ""
+
+#: .\apps\common\choices.py:36
+msgid "Передний"
+msgstr ""
+
+#: .\apps\common\choices.py:37
+msgid "Задний"
+msgstr ""
+
+#: .\apps\common\choices.py:38
+msgid "Полный"
+msgstr ""
+
+#: .\apps\common\choices.py:41
+msgid "Ожидает подтверждения"
+msgstr ""
+
+#: .\apps\common\choices.py:42
+msgid "Подтверждена"
+msgstr ""
+
+#: .\apps\common\choices.py:43
+msgid "Отклонена"
+msgstr ""
+
+#: .\apps\common\choices.py:44
+msgid "Истекло время ожидания"
+msgstr ""
+
+#: .\apps\common\choices.py:45
+msgid "Отменено клиентом"
+msgstr ""
+
+#: .\apps\common\choices.py:46
+msgid "Авто выдано"
+msgstr ""
+
+#: .\apps\common\choices.py:47
+msgid "Завершена"
+msgstr ""
+
+#: .\apps\common\choices.py:50
+msgid "Не оплачено"
+msgstr ""
+
+#: .\apps\common\choices.py:54
+msgid "Создан"
+msgstr ""
+
+#: .\apps\common\choices.py:55
+msgid "Ожидает оплаты"
+msgstr ""
+
+#: .\apps\common\choices.py:56
+msgid "Оплачен"
+msgstr ""
+
+#: .\apps\common\choices.py:57
+msgid "Ошибка оплаты"
+msgstr ""
+
+#: .\apps\common\choices.py:58
+msgid "Возврат"
+msgstr ""
+
+#: .\apps\common\choices.py:61
+msgid "Click"
+msgstr ""
+
+#: .\apps\common\choices.py:62
+msgid "Payme"
+msgstr ""
+
+#: .\apps\partners\api.py:35
+msgid "Партнёрский пользователь с таким username не найден."
+msgstr ""
+
+#: .\apps\partners\api.py:38
+msgid "Этот username уже привязан к другому Telegram ID."
+msgstr ""
+
+#: .\apps\partners\models.py:11
+msgid "Название партнёра"
+msgstr ""
+
+#: .\apps\partners\models.py:13
+msgid "Отображаемое название компании/ИП"
+msgstr ""
+
+#: .\apps\partners\models.py:16 .\apps\users\models.py:16
+msgid "Телефон"
+msgstr ""
+
+#: .\apps\partners\models.py:21
+msgid "Email"
+msgstr ""
+
+#: .\apps\partners\models.py:35
+msgid "Партнёры"
+msgstr ""
+
+#: .\apps\partners\models.py:51 .\apps\users\models.py:13
+msgid "Telegram username"
+msgstr ""
+
+#: .\apps\partners\models.py:56
+msgid "Без @. Например: webadiko"
+msgstr ""
+
+#: .\apps\partners\models.py:59 .\apps\users\models.py:9
+msgid "Telegram user id"
+msgstr ""
+
+#: .\apps\partners\models.py:62
+msgid "Роль"
+msgstr ""
+
+#: .\apps\partners\models.py:71
+msgid "Пользователь партнёра"
+msgstr ""
+
+#: .\apps\partners\models.py:72
+msgid "Пользователи партнёров"
+msgstr ""
+
+#: .\apps\partners\models.py:90
+msgid "Админ-пользователь"
+msgstr ""
+
+#: .\apps\partners\models.py:98
+msgid "Активна"
+msgstr ""
+
+#: .\apps\partners\models.py:103
+msgid "Связь админ-пользователь ↔ партнёр"
+msgstr ""
+
+#: .\apps\partners\models.py:104
+msgid "Связи админ-пользователь ↔ партнёр"
+msgstr ""
+
+#: .\apps\partners\translation.py:9
+msgid "-- sorry, no translation provided --"
+msgstr ""
+
+#: .\apps\payments\api.py:25
+msgid "Неверный провайдер оплаты."
+msgstr ""
+
+#: .\apps\payments\models.py:19
+msgid "Провайдер"
+msgstr ""
+
+#: .\apps\payments\models.py:23
+msgid "Сумма, UZS"
+msgstr ""
+
+#: .\apps\payments\models.py:26
+msgid "ID счёта/заказа"
+msgstr ""
+
+#: .\apps\payments\models.py:27
+msgid "Ссылка на оплату"
+msgstr ""
+
+#: .\apps\payments\models.py:30
+msgid "Статус оплаты"
+msgstr ""
+
+#: .\apps\payments\models.py:36
+msgid "Сырой ответ провайдера"
+msgstr ""
+
+#: .\apps\payments\models.py:42
+msgid "Платёж"
+msgstr ""
+
+#: .\apps\payments\models.py:43
+msgid "Платежи"
+msgstr ""
+
+#: .\apps\users\models.py:14
+msgid "Без @"
+msgstr ""
+
+#: .\apps\users\models.py:19
+msgid "Номер, полученный через request_contact"
+msgstr ""
+
+#: .\apps\users\models.py:21
+msgid "Имя"
+msgstr ""
+
+#: .\apps\users\models.py:22
+msgid "Фамилия"
+msgstr ""
+
+#: .\apps\users\models.py:24
+msgid "Язык интерфейса"
+msgstr ""
+
+#: .\apps\users\models.py:27
+msgid "Коды: uz/ru/en"
+msgstr ""
+
+#: .\apps\users\models.py:34
+msgid "Пользователь бота"
+msgstr ""
+
+#: .\apps\users\models.py:35
+msgid "Пользователи бота"
+msgstr ""
