@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.db import transaction
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+import logging
 
 from paytechuz.integrations.django.webhooks import (
     PaymeWebhook as BasePaymeWebhookView,
@@ -14,6 +15,7 @@ from apps.bookings.models import Booking
 from .models import Payment
 from apps.common.choices import PaymentStatus, PaymentMarker
 
+log = logging.getLogger(__name__)
 
 def _last_pending_payment(booking_id: int, provider: str | None = None) -> Payment | None:
     qs = Payment.objects.filter(booking_id=booking_id, status=PaymentStatus.PENDING)
@@ -21,31 +23,22 @@ def _last_pending_payment(booking_id: int, provider: str | None = None) -> Payme
         qs = qs.filter(provider=provider)
     return qs.order_by("-created_at").first()
 
-
-# ───────── Payme ─────────
 @method_decorator(csrf_exempt, name="dispatch")
 class PaymeWebhookView(BasePaymeWebhookView):
     """
-    Минимальный кастом под PayTechUz:
-    - сумму валидируем по последнему Payment(PENDING) (аванс/полная)
-    - при расхождении кидаем InvalidAmount (=> -31001), при отсутствии платежа — AccountNotFound (=> -31050)
-    В остальном поведение оставляем как в библиотеке.
+    Валидация суммы — по последнему Payment(PENDING) (аванс/полная).
+    Любые наши побочные действия при success/cancel — идемпотентны,
+    ошибки логируем, наружу не отдаём (иначе Payme видит -32400).
     """
 
     def _validate_amount(self, account, amount):
-        """
-        account: Booking (ACCOUNT_MODEL)
-        amount: int (тийины) из Payme
-        """
-        payment = _last_pending_payment(account.id, provider="payme")
-        if not payment or payment.amount is None:
-            # платёж не инициализирован на нашей стороне -> запрещаем
+        p = _last_pending_payment(account.id, provider="payme")
+        if not p or p.amount is None:
             raise AccountNotFound("Payment is not initialized for this account")
 
-        expected_tiyin = int(Decimal(payment.amount) * 100)
+        expected_tiyin = int(Decimal(p.amount) * 100)
         received_tiyin = int(Decimal(amount))
         if expected_tiyin != received_tiyin:
-            # вернётся -31001 (а не -32400)
             raise InvalidAmount(
                 f"Invalid amount. Expected: {expected_tiyin}, received: {received_tiyin}"
             )
@@ -53,46 +46,124 @@ class PaymeWebhookView(BasePaymeWebhookView):
 
     @transaction.atomic
     def successfully_payment(self, params, transaction_obj):
-        booking = Booking.objects.select_for_update().get(id=transaction_obj.account_id)
-        p = _last_pending_payment(booking.id, provider="payme")
-        if p:
-            p.status = PaymentStatus.PAID
-            p.raw_meta = {"payme": {"transaction": transaction_obj.__dict__, "params": params}}
-            p.save(update_fields=["status", "raw_meta", "updated_at"])
-        booking.payment_marker = PaymentMarker.PAID
-        booking.save(update_fields=["payment_marker", "updated_at"])
+        """
+        PayTechUZ уже перевёл транзакцию в state=2.
+        Делаем наши апдейты безопасно и идемпотентно.
+        """
+        try:
+            booking = Booking.objects.select_for_update().get(id=transaction_obj.account_id)
+
+            # если уже оплачен — тихо выходим
+            already_paid = Payment.objects.filter(
+                booking_id=booking.id, provider="payme", status=PaymentStatus.PAID
+            ).exists()
+            if already_paid:
+                return
+
+            p = _last_pending_payment(booking.id, provider="payme")
+            if p:
+                p.status = PaymentStatus.PAID
+                meta = p.raw_meta or {}
+                meta.setdefault("payme", {})
+                meta["payme"]["transaction"] = {
+                    "id": transaction_obj.transaction_id,
+                    "account_id": transaction_obj.account_id,
+                    "state": transaction_obj.state,
+                }
+                meta["payme"]["params"] = params
+                p.raw_meta = meta
+                p.save(update_fields=["status", "raw_meta", "updated_at"])
+
+            booking.payment_marker = PaymentMarker.PAID
+            booking.save(update_fields=["payment_marker", "updated_at"])
+
+        except Exception as e:
+            # не ломаем ответ Payme — только логируем
+            log.exception("Payme successfully_payment hook failed: %s", e)
 
     @transaction.atomic
     def cancelled_payment(self, params, transaction_obj):
-        # вызовется и при CancelTransaction, и при неуспешном завершении
-        booking = Booking.objects.select_for_update().get(id=transaction_obj.account_id)
-        p = _last_pending_payment(booking.id, provider="payme")
-        if p:
-            p.status = PaymentStatus.FAILED
-            p.raw_meta = {"payme": {"transaction": transaction_obj.__dict__, "params": params}}
-            p.save(update_fields=["status", "raw_meta", "updated_at"])
-        # машину освобождать должен ваш слой бронирований (вы это уже добавляли в авто-отмену)
+        try:
+            booking = Booking.objects.select_for_update().get(id=transaction_obj.account_id)
+            # если уже зафиксирован как FAILED/PAID — выходим
+            done = Payment.objects.filter(
+                booking_id=booking.id, provider="payme",
+                status__in=[PaymentStatus.PAID, PaymentStatus.FAILED]
+            ).exists()
+            if done:
+                return
+
+            p = _last_pending_payment(booking.id, provider="payme")
+            if p:
+                p.status = PaymentStatus.FAILED
+                meta = p.raw_meta or {}
+                meta.setdefault("payme", {})
+                meta["payme"]["transaction"] = {
+                    "id": transaction_obj.transaction_id,
+                    "account_id": transaction_obj.account_id,
+                    "state": transaction_obj.state,
+                }
+                meta["payme"]["params"] = params
+                p.raw_meta = meta
+                p.save(update_fields=["status", "raw_meta", "updated_at"])
+        except Exception as e:
+            log.exception("Payme cancelled_payment hook failed: %s", e)
 
 
-# ───────── Click ─────────
 @method_decorator(csrf_exempt, name="dispatch")
 class ClickWebhookView(BaseClickWebhookView):
     @transaction.atomic
     def successfully_payment(self, params, transaction_obj):
-        booking = Booking.objects.select_for_update().get(id=transaction_obj.account_id)
-        p = _last_pending_payment(booking.id, provider="click")
-        if p:
-            p.status = PaymentStatus.PAID
-            p.raw_meta = {"click": {"transaction": transaction_obj.__dict__, "params": params}}
-            p.save(update_fields=["status", "raw_meta", "updated_at"])
-        booking.payment_marker = PaymentMarker.PAID
-        booking.save(update_fields=["payment_marker", "updated_at"])
+        try:
+            booking = Booking.objects.select_for_update().get(id=transaction_obj.account_id)
+            already_paid = Payment.objects.filter(
+                booking_id=booking.id, provider="click", status=PaymentStatus.PAID
+            ).exists()
+            if already_paid:
+                return
+
+            p = _last_pending_payment(booking.id, provider="click")
+            if p:
+                p.status = PaymentStatus.PAID
+                meta = p.raw_meta or {}
+                meta.setdefault("click", {})
+                meta["click"]["transaction"] = {
+                    "id": transaction_obj.transaction_id,
+                    "account_id": transaction_obj.account_id,
+                    "state": transaction_obj.state,
+                }
+                meta["click"]["params"] = params
+                p.raw_meta = meta
+                p.save(update_fields=["status", "raw_meta", "updated_at"])
+
+            booking.payment_marker = PaymentMarker.PAID
+            booking.save(update_fields=["payment_marker", "updated_at"])
+        except Exception as e:
+            log.exception("Click successfully_payment hook failed: %s", e)
 
     @transaction.atomic
     def cancelled_payment(self, params, transaction_obj):
-        booking = Booking.objects.select_for_update().get(id=transaction_obj.account_id)
-        p = _last_pending_payment(booking.id, provider="click")
-        if p:
-            p.status = PaymentStatus.FAILED
-            p.raw_meta = {"click": {"transaction": transaction_obj.__dict__, "params": params}}
-            p.save(update_fields=["status", "raw_meta", "updated_at"])
+        try:
+            booking = Booking.objects.select_for_update().get(id=transaction_obj.account_id)
+            done = Payment.objects.filter(
+                booking_id=booking.id, provider="click",
+                status__in=[PaymentStatus.PAID, PaymentStatus.FAILED]
+            ).exists()
+            if done:
+                return
+
+            p = _last_pending_payment(booking.id, provider="click")
+            if p:
+                p.status = PaymentStatus.FAILED
+                meta = p.raw_meta or {}
+                meta.setdefault("click", {})
+                meta["click"]["transaction"] = {
+                    "id": transaction_obj.transaction_id,
+                    "account_id": transaction_obj.account_id,
+                    "state": transaction_obj.state,
+                }
+                meta["click"]["params"] = params
+                p.raw_meta = meta
+                p.save(update_fields=["status", "raw_meta", "updated_at"])
+        except Exception as e:
+            log.exception("Click cancelled_payment hook failed: %s", e)
