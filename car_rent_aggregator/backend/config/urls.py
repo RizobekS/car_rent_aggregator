@@ -4,6 +4,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from django.conf.urls.i18n import i18n_patterns
 
 from apps.bookings.api import BookingViewSet
 from apps.payments.api import PaymentViewSet
@@ -20,15 +21,14 @@ router.register(r"bookings", BookingViewSet, basename="bookings")
 router.register(r"payments", PaymentViewSet, basename="payments")
 
 urlpatterns = [
-                  path("set_language/<str:lang>/",
-                       ActivateLanguageView.as_view(), name="set_language_from_url"),
-                  path("admin/", admin.site.urls),
+                  path("set_language/<str:lang>/", ActivateLanguageView.as_view(), name="set_language_from_url"),
                   path('i18n/', include('django.conf.urls.i18n')),
+                  path("admin/", admin.site.urls),
                   path("api/", include([
                       path("", include(router.urls)),
                       path("cars/search/", CarsSearchView.as_view(), name="cars-search"),
                       path("users/register/", RegisterView.as_view(), name="users-register"),
-                      path("users/check/",    CheckView.as_view()),
+                      path("users/check/", CheckView.as_view()),
                       path("partners/link/", PartnerLinkView.as_view(), name="partners-link"),
                       # ⬇️ Вебхуки PayTechUZ — по одному URL без action:
                       path("payments/payme/webhook/", PaymeWebhookView.as_view(), name="payme-webhook"),

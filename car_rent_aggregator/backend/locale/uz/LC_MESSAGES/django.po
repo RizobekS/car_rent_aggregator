@@ -3,620 +3,715 @@ msgid ""
 msgstr ""
 "Project-Id-Version: car_rent_aggregator\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-10 00:00+0000\n"
+"POT-Creation-Date: 2025-10-14 13:10+0100\n"
 "PO-Revision-Date: 2025-10-10 00:00+0000\n"
 "Last-Translator: WEBadiko\n"
 "Language-Team: Uzbek\n"
-"Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: uz\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: apps/bookings/admin.py
-msgid "(нет данных)"
-msgstr "(maʼlumot yoʻq)"
+#: .\apps\audit\models.py:8
+msgid "Актор"
+msgstr "Aktor"
 
-#: apps/bookings/admin.py apps/bookings/models.py
-msgid "Клиент"
-msgstr "Mijoz"
+#: .\apps\audit\models.py:8
+msgid "Напр.: client:123, partner:45, system"
+msgstr "Masalan: client:123, partner:45, system"
 
-#: apps/bookings/models.py apps/cars/models.py apps/partners/models.py apps/partners/models.py
-msgid "Партнёр"
-msgstr "Hamkor"
+#: .\apps\audit\models.py:9
+msgid "Действие"
+msgstr "Amal"
 
-#: apps/bookings/models.py
-msgid "Телефон клиента"
-msgstr "Mijoz telefoni"
+#: .\apps\audit\models.py:9
+msgid "Напр.: booking.create, payment.paid"
+msgstr "Masalan: booking.create, payment.paid"
 
-#: apps/bookings/models.py
-msgid "Аренда с"
-msgstr "Ijara boshlanishi"
+#: .\apps\audit\models.py:10
+msgid "Данные"
+msgstr "Ma'lumotlar"
 
-#: apps/bookings/models.py
-msgid "Аренда по"
-msgstr "Ijara tugashi"
-
-#: apps/bookings/models.py
-msgid "Расчётная стоимость, UZS"
-msgstr "Hisobiy narx, UZS"
-
-#: apps/bookings/models.py
-msgid "Статус брони"
-msgstr "Bron holati"
-
-#: apps/bookings/models.py
-msgid "Оплата брони"
-msgstr "Bron toʻlovi"
-
-#: apps/bookings/models.py apps/cars/models.py apps/partners/models.py apps/payments/models.py apps/users/models.py
+#: .\apps\audit\models.py:11 .\apps\bookings\models.py:55
+#: .\apps\bookings\models.py:97 .\apps\cars\models.py:59
+#: .\apps\cars\models.py:83 .\apps\cars\models.py:106
+#: .\apps\partners\models.py:30 .\apps\partners\models.py:68
+#: .\apps\partners\models.py:99 .\apps\payments\models.py:38
+#: .\apps\users\models.py:30
 msgid "Создано"
 msgstr "Yaratildi"
 
-#: apps/bookings/models.py apps/cars/models.py apps/partners/models.py apps/payments/models.py apps/users/models.py
-msgid "Обновлено"
-msgstr "Yangilandi"
+#: .\apps\audit\models.py:14
+msgid "Событие аудита"
+msgstr "Audit hodisasi"
 
-#: apps/bookings/models.py
-msgid "Бронирование"
-msgstr "Bron"
+#: .\apps\audit\models.py:15
+msgid "События аудита"
+msgstr "Audit hodisalari"
 
-#: apps/bookings/models.py
-msgid "Бронирования"
-msgstr "Bronlar"
+#: .\apps\bookings\admin.py:78
+msgid "(нет данных)"
+msgstr "(maʼlumot yoʻq)"
 
-#: apps/bookings/models.py apps/cars/models.py
+#: .\apps\bookings\admin.py:80 .\apps\bookings\models.py:26
+msgid "Клиент"
+msgstr "Mijoz"
+
+#: .\apps\bookings\api.py:64 .\apps\bookings\models.py:70
 msgid "Дата 'Аренда по' должна быть больше даты 'Аренда с'."
-msgstr "“Ijara tugash” sanasi “Ijara boshlanish” sanasidan katta boʻlishi kerak."
+msgstr ""
+"“Ijara tugash” sanasi “Ijara boshlanish” sanasidan katta boʻlishi kerak."
 
-#: apps/bookings/models.py
-msgid "Предыдущая дата окончания"
-msgstr "Avvalgi tugash sanasi"
-
-#: apps/bookings/models.py
-msgid "Новая дата окончания"
-msgstr "Yangi tugash sanasi"
-
-#: apps/bookings/models.py
-msgid "Кол-во добавленных дней"
-msgstr "Qoʻshilgan kunlar soni"
-
-#: apps/bookings/models.py
-msgid "Стоимость продления, UZS"
-msgstr "Uzaytirish narxi, UZS"
-
-#: apps/bookings/models.py
-msgid "Комиссия/сервисный сбор, UZS"
-msgstr "Komissiya/xizmat haqi, UZS"
-
-#: apps/bookings/models.py apps/payments/models.py
-msgid "Валюта"
-msgstr "Valyuta"
-
-#: apps/bookings/models.py
-msgid "Статус продления"
-msgstr "Uzaytirish holati"
-
-#: apps/bookings/models.py
-msgid "Ожидает"
-msgstr "Kutilmoqda"
-
-#: apps/bookings/models.py
-msgid "Оплачено"
-msgstr "Toʻlangan"
-
-#: apps/bookings/models.py
-msgid "Отклонено"
-msgstr "Rad etildi"
-
-#: apps/bookings/models.py
-msgid "Идентификатор оплаты"
-msgstr "Toʻlov identifikatori"
-
-#: apps/bookings/models.py
-msgid "Продление брони"
-msgstr "Bronni uzaytirish"
-
-#: apps/bookings/models.py
-msgid "Продления брони"
-msgstr "Bronni uzaytirishlar"
-
-#: apps/bookings/api.py
+#: .\apps\bookings\api.py:88
 msgid "Автомобиль занят на выбранные даты."
 msgstr "Tanlangan sanalarda avtomobil band."
 
-#: apps/bookings/api.py
+#: .\apps\bookings\api.py:90
 msgid "На эти даты уже есть подтверждённая бронь."
 msgstr "Ushbu sanalarda tasdiqlangan bron allaqachon mavjud."
 
-#: apps/bookings/api.py
+#: .\apps\bookings\api.py:94
 msgid "Слот временно удерживается другим запросом, попробуйте позже."
-msgstr "Vaqt oraligʻi boshqa soʻrov tomonidan vaqtincha band. Keyinroq urinib koʻring."
+msgstr ""
+"Vaqt oraligʻi boshqa soʻrov tomonidan vaqtincha band. Keyinroq urinib "
+"koʻring."
 
-#: apps/bookings/api.py
-msgid "Нужно передать partner_tg_user_id или partner_username"
-msgstr "partner_tg_user_id yoki partner_username qiymatini yuborishingiz kerak"
-
-#: apps/bookings/api.py
+#: .\apps\bookings\api.py:209
 msgid "Нет прав подтверждать эту бронь."
 msgstr "Ushbu bronni tasdiqlash huquqingiz yoʻq."
 
-#: apps/bookings/api.py
+#: .\apps\bookings\api.py:212
 msgid "Бронь не в статусе ожидания."
 msgstr "Bron kutish holatida emas."
 
-#: apps/bookings/api.py
+#: .\apps\bookings\api.py:215
 msgid "Истекло время ожидания подтверждения."
 msgstr "Tasdiqlashni kutish vaqti tugadi."
 
-#: apps/bookings/api.py
+#: .\apps\bookings\api.py:219
 msgid "Авто уже занято на эти даты."
 msgstr "Ushbu sanalarda avtomobil allaqachon band."
 
-#: apps/bookings/api.py
+#: .\apps\bookings\api.py:224
 msgid "Есть другая подтверждённая бронь в этот период."
 msgstr "Ushbu davrda boshqa tasdiqlangan bron mavjud."
 
-#: apps/bookings/api.py
+#: .\apps\bookings\api.py:243
 msgid "Нет прав отклонять эту бронь."
 msgstr "Ushbu bronni rad etish huquqingiz yoʻq."
 
-#: apps/bookings/api.py
+#: .\apps\bookings\api.py:246
 msgid "Бронь уже обработана."
 msgstr "Bron allaqachon qayta ishlangan."
 
-#: apps/bookings/api.py
+#: .\apps\bookings\api.py:258
 msgid "Можно отменить только собственную бронь."
 msgstr "Faqat oʻzingizning broningizni bekor qilishingiz mumkin."
 
-#: apps/bookings/api.py
+#: .\apps\bookings\api.py:284
 msgid "Отмена невозможна: бронь уже обработана."
 msgstr "Bekor qilish imkonsiz: bron allaqachon qayta ishlangan."
 
-#: apps/cars/models.py
-msgid "Название автомобиля для клиента"
-msgstr "Mijoz uchun avtomobil nomi"
+#: .\apps\bookings\api.py:293
+msgid "Нужно передать partner_tg_user_id или partner_username"
+msgstr "partner_tg_user_id yoki partner_username qiymatini yuborishingiz kerak"
 
-#: apps/cars/models.py
-msgid "Напр.: Chevrolet Cobalt 2022"
-msgstr "Masalan: Chevrolet Cobalt 2022"
-
-#: apps/cars/models.py
-msgid "Марка автомобиля"
-msgstr "Avtomobil markasi"
-
-#: apps/cars/models.py
-msgid "Модель автомобиля"
-msgstr "Avtomobil modeli"
-
-#: apps/cars/models.py
-msgid "Год выпуска"
-msgstr "Ishlab chiqarilgan yil"
-
-#: apps/cars/models.py
-msgid "Класс авто"
-msgstr "Avto klassi"
-
-#: apps/cars/models.py
-msgid "Трансмиссия"
-msgstr "Transmissiya"
-
-#: apps/cars/models.py
-msgid "Пробег, км"
-msgstr "Yurgan masofa, km"
-
-#: apps/cars/models.py
-msgid "Объём двигателя, л"
-msgstr "Dvigatel hajmi, l"
-
-#: apps/cars/models.py
-msgid "Мощность, л.с."
-msgstr "Quvvat, ot kuchi"
-
-#: apps/cars/models.py
-msgid "Тип топлива"
-msgstr "Yoqilgʻi turi"
-
-#: apps/cars/models.py
-msgid "Расход, л/100 км"
-msgstr "Sarflanish, l/100 km"
-
-#: apps/cars/models.py
-msgid "Привод"
-msgstr "Uzatma (privod)"
-
-#: apps/cars/models.py
-msgid "Цвет"
-msgstr "Rang"
-
-#: apps/cars/models.py
-msgid "Страховка включена"
-msgstr "Sugʻurta kiritilgan"
-
-#: apps/cars/models.py
-msgid "Детское кресло"
-msgstr "Bola oʻrindigʻi"
-
-#: apps/cars/models.py
-msgid "Цена в будни, UZS"
-msgstr "Ish kunlari narxi, UZS"
-
-#: apps/cars/models.py
-msgid "Цена в выходные, UZS"
-msgstr "Dam olish kunlari narxi, UZS"
-
-#: apps/cars/models.py
-msgid "Диапазон залога"
-msgstr "Garov diapazoni"
-
-#: apps/cars/models.py
-msgid "Без залога"
-msgstr "Garovsiz"
-
-#: apps/cars/models.py
-msgid "Низкий залог"
-msgstr "Past garov"
-
-#: apps/cars/models.py
-msgid "Высокий залог"
-msgstr "Yuqori garov"
-
-#: apps/cars/models.py
-msgid "Сумма аванса, UZS"
-msgstr "Oldindan toʻlov summasi, UZS"
-
-#: apps/cars/models.py
-msgid "Если фиксированная сумма, иначе оставьте пустым"
-msgstr "Agar qatʼiy summa boʻlsa, aks holda boʻsh qoldiring"
-
-#: apps/cars/models.py
-msgid "Суточный лимит, км"
-msgstr "Kunlik limit, km"
-
-#: apps/cars/models.py
-msgid "Доставка авто возможна"
-msgstr "Avtomobilni yetkazib berish mumkin"
-
-#: apps/cars/models.py
-msgid "Автомобиль с водителем"
-msgstr "Haydovchi bilan avtomobil"
-
-#: apps/cars/models.py
-msgid "Telegram file_id обложки"
-msgstr "Telegram cover file_id"
-
-#: apps/cars/models.py
-msgid "Опубликован"
-msgstr "Eʼlon qilingan"
-
-#: apps/cars/models.py
+#: .\apps\bookings\models.py:14 .\apps\cars\models.py:63
+#: .\apps\cars\models.py:77 .\apps\cars\models.py:101
 msgid "Автомобиль"
 msgstr "Avtomobil"
 
-#: apps/cars/models.py
+#: .\apps\bookings\models.py:20 .\apps\cars\admin.py:131
+#: .\apps\cars\models.py:12 .\apps\partners\models.py:34
+#: .\apps\partners\models.py:46 .\apps\partners\models.py:96
+msgid "Партнёр"
+msgstr "Hamkor"
+
+#: .\apps\bookings\models.py:30
+msgid "Телефон клиента"
+msgstr "Mijoz telefoni"
+
+#: .\apps\bookings\models.py:32
+msgid "Аренда с"
+msgstr "Ijara boshlanishi"
+
+#: .\apps\bookings\models.py:33
+msgid "Аренда по"
+msgstr "Ijara tugashi"
+
+#: .\apps\bookings\models.py:36
+msgid "Расчётная стоимость, UZS"
+msgstr "Hisobiy narx, UZS"
+
+#: .\apps\bookings\models.py:42
+msgid "Статус брони"
+msgstr "Bron holati"
+
+#: .\apps\bookings\models.py:49
+msgid "Оплата брони"
+msgstr "Bron toʻlovi"
+
+#: .\apps\bookings\models.py:56 .\apps\cars\models.py:60
+#: .\apps\partners\models.py:31 .\apps\payments\models.py:39
+#: .\apps\users\models.py:31
+msgid "Обновлено"
+msgstr "Yangilandi"
+
+#: .\apps\bookings\models.py:59 .\apps\bookings\models.py:80
+#: .\apps\payments\models.py:12
+msgid "Бронирование"
+msgstr "Bron"
+
+#: .\apps\bookings\models.py:60
+msgid "Бронирования"
+msgstr "Bronlar"
+
+#: .\apps\bookings\models.py:84
+msgid "Предыдущая дата окончания"
+msgstr "Avvalgi tugash sanasi"
+
+#: .\apps\bookings\models.py:85
+msgid "Новая дата окончания"
+msgstr "Yangi tugash sanasi"
+
+#: .\apps\bookings\models.py:86
+msgid "Кол-во добавленных дней"
+msgstr "Qoʻshilgan kunlar soni"
+
+#: .\apps\bookings\models.py:87
+msgid "Стоимость продления, UZS"
+msgstr "Uzaytirish narxi, UZS"
+
+#: .\apps\bookings\models.py:88
+msgid "Комиссия/сервисный сбор, UZS"
+msgstr "Komissiya/xizmat haqi, UZS"
+
+#: .\apps\bookings\models.py:89 .\apps\payments\models.py:24
+msgid "Валюта"
+msgstr "Valyuta"
+
+#: .\apps\bookings\models.py:91
+msgid "Статус продления"
+msgstr "Uzaytirish holati"
+
+#: .\apps\bookings\models.py:93
+msgid "Ожидает"
+msgstr "Kutilmoqda"
+
+#: .\apps\bookings\models.py:93 .\apps\common\choices.py:51
+msgid "Оплачено"
+msgstr "Toʻlangan"
+
+#: .\apps\bookings\models.py:93
+msgid "Отклонено"
+msgstr "Rad etildi"
+
+#: .\apps\bookings\models.py:96
+msgid "Идентификатор оплаты"
+msgstr "Toʻlov identifikatori"
+
+#: .\apps\bookings\models.py:100
+msgid "Продление брони"
+msgstr "Bronni uzaytirish"
+
+#: .\apps\bookings\models.py:101
+msgid "Продления брони"
+msgstr "Bronni uzaytirishlar"
+
+#: .\apps\cars\admin.py:36 .\apps\cars\admin.py:37
+msgid "Фотографии"
+msgstr "Rasmlar"
+
+#: .\apps\cars\admin.py:51
+msgid "Общее"
+msgstr "Umumiy"
+
+#: .\apps\cars\admin.py:54
+msgid "Технические данные"
+msgstr "Texnik ma'lumotlar"
+
+#: .\apps\cars\admin.py:61
+msgid "Условия и цены"
+msgstr "Shartlar va narxlar"
+
+#: .\apps\cars\admin.py:102
+msgid "У вас нет привязанных партнёров. Обратитесь к администратору."
+msgstr "Sizda bog‘langan hamkorlar yo‘q. Iltimos, administratorga murojaat qiling."
+
+#: .\apps\cars\admin.py:108
+msgid "Нельзя выбрать этого партнёра."
+msgstr "Bu hamkorni tanlab boʻlmaydi."
+
+#: .\apps\cars\admin.py:111
+msgid "Нельзя менять владельца автомобиля."
+msgstr "Avtomobil egasini almashtirish mumkin emas."
+
+#: .\apps\cars\models.py:16
+msgid "Название автомобиля для клиента"
+msgstr "Mijoz uchun avtomobil nomi"
+
+#: .\apps\cars\models.py:17
+msgid "Напр.: Chevrolet Cobalt 2022"
+msgstr "Masalan: Chevrolet Cobalt 2022"
+
+#: .\apps\cars\models.py:18
+msgid "Марка автомобиля"
+msgstr "Avtomobil markasi"
+
+#: .\apps\cars\models.py:19
+msgid "Модель автомобиля"
+msgstr "Avtomobil modeli"
+
+#: .\apps\cars\models.py:20
+msgid "Год выпуска"
+msgstr "Ishlab chiqarilgan yil"
+
+#: .\apps\cars\models.py:22
+msgid "Класс авто"
+msgstr "Avto klassi"
+
+#: .\apps\cars\models.py:23
+msgid "Трансмиссия"
+msgstr "Transmissiya"
+
+#: .\apps\cars\models.py:26
+msgid "Пробег, км"
+msgstr "Yurgan masofa, km"
+
+#: .\apps\cars\models.py:27
+msgid "Объём двигателя, л"
+msgstr "Dvigatel hajmi, l"
+
+#: .\apps\cars\models.py:29
+msgid "Мощность, л.с."
+msgstr "Quvvat, ot kuchi"
+
+#: .\apps\cars\models.py:30
+msgid "Тип топлива"
+msgstr "Yoqilgʻi turi"
+
+#: .\apps\cars\models.py:32
+msgid "Расход, л/100 км"
+msgstr "Sarflanish, l/100 km"
+
+#: .\apps\cars\models.py:34
+msgid "Привод"
+msgstr "Uzatma (privod)"
+
+#: .\apps\cars\models.py:36
+msgid "Цвет"
+msgstr "Rang"
+
+#: .\apps\cars\models.py:37
+msgid "Страховка включена"
+msgstr "Sugʻurta kiritilgan"
+
+#: .\apps\cars\models.py:38
+msgid "Детское кресло"
+msgstr "Bola oʻrindigʻi"
+
+#: .\apps\cars\models.py:41
+msgid "Цена в будни, UZS"
+msgstr "Ish kunlari narxi, UZS"
+
+#: .\apps\cars\models.py:42
+msgid "Цена в выходные, UZS"
+msgstr "Dam olish kunlari narxi, UZS"
+
+#: .\apps\cars\models.py:45
+msgid "Диапазон залога"
+msgstr "Garov diapazoni"
+
+#: .\apps\cars\models.py:46
+msgid "Без залога"
+msgstr "Garovsiz"
+
+#: .\apps\cars\models.py:46
+msgid "Низкий залог"
+msgstr "Past garov"
+
+#: .\apps\cars\models.py:46
+msgid "Высокий залог"
+msgstr "Yuqori garov"
+
+#: .\apps\cars\models.py:49
+msgid "Сумма аванса, UZS"
+msgstr "Oldindan toʻlov summasi, UZS"
+
+#: .\apps\cars\models.py:51
+msgid "Если фиксированная сумма, иначе оставьте пустым"
+msgstr "Agar qatʼiy summa boʻlsa, aks holda boʻsh qoldiring"
+
+#: .\apps\cars\models.py:52
+msgid "Суточный лимит, км"
+msgstr "Kunlik limit, km"
+
+#: .\apps\cars\models.py:53
+msgid "Доставка авто возможна"
+msgstr "Avtomobilni yetkazib berish mumkin"
+
+#: .\apps\cars\models.py:54
+msgid "Автомобиль с водителем"
+msgstr "Haydovchi bilan avtomobil"
+
+#: .\apps\cars\models.py:56
+msgid "Telegram file_id обложки"
+msgstr "Telegram cover file_id"
+
+#: .\apps\cars\models.py:57
+msgid "Опубликован"
+msgstr "Eʼlon qilingan"
+
+#: .\apps\cars\models.py:64
 msgid "Автомобили"
 msgstr "Avtomobillar"
 
-#: apps/cars/models.py
-msgid "Календарь занятости"
-msgstr "Bandlik taqvimi"
-
-#: apps/cars/models.py
-msgid "Календарь занятости (авто)"
-msgstr "Bandlik taqvimi (avto)"
-
-#: apps/cars/models.py
+#: .\apps\cars\models.py:79
 msgid "Занят с"
 msgstr "Band boshidan"
 
-#: apps/cars/models.py
+#: .\apps\cars\models.py:80
 msgid "Занят по"
 msgstr "Band oxirigacha"
 
-#: apps/cars/models.py
-msgid "Занято"
-msgstr "Band"
-
-#: apps/cars/models.py
-msgid "Фото автомобиля"
-msgstr "Avtomobil fotosi"
-
-#: apps/cars/models.py
-msgid "Фото 1 (обложка)"
-msgstr "Foto 1 (muqova)"
-
-#: apps/cars/models.py
-msgid "Фото 2"
-msgstr "Foto 2"
-
-#: apps/cars/models.py
-msgid "Фото 3"
-msgstr "Foto 3"
-
-#: apps/cars/models.py
-msgid "Фото 4"
-msgstr "Foto 4"
-
-#: apps/partners/models.py
-msgid "Название партнёра"
-msgstr "Hamkor nomi"
-
-#: apps/partners/models.py
-msgid "Отображаемое название компании/ИП"
-msgstr "Kompaniya/YTT ko‘rsatiladigan nomi"
-
-#: apps/partners/models.py
-msgid "Телефон"
-msgstr "Telefon"
-
-#: apps/partners/models.py
-msgid "Email"
-msgstr "Email"
-
-#: apps/partners/models.py
+#: .\apps\cars\models.py:81 .\apps\partners\models.py:25
 msgid "Статус"
 msgstr "Holat"
 
-#: apps/partners/models.py
-msgid "Партнёры"
-msgstr "Hamkorlar"
+#: .\apps\cars\models.py:82
+msgid "Занято"
+msgstr "Band"
 
-#: apps/partners/models.py
-msgid "Telegram username"
-msgstr "Telegram username"
+#: .\apps\cars\models.py:86
+msgid "Календарь занятости"
+msgstr "Bandlik taqvimi"
 
-#: apps/partners/models.py
-msgid "Без @. Например: webadiko"
-msgstr "@ belgisiz. Masalan: webadiko"
+#: .\apps\cars\models.py:87
+msgid "Календарь занятости (авто)"
+msgstr "Bandlik taqvimi (avto)"
 
-#: apps/partners/models.py
-msgid "Telegram user id"
-msgstr "Telegram user id"
+#: .\apps\cars\models.py:93
+msgid "Дата 'Занят по' должна быть больше даты 'Занят с'."
+msgstr ""
+"'Band tugash' sanasi 'Band boshlanish' sanasidan katta boʻlishi kerak."
 
-#: apps/partners/models.py
-msgid "Роль"
-msgstr "Roli"
+#: .\apps\cars\models.py:102
+msgid "Фото 1 (обложка)"
+msgstr "Foto 1 (muqova)"
 
-#: apps/partners/models.py
-msgid "Пользователь партнёра"
-msgstr "Hamkor foydalanuvchisi"
+#: .\apps\cars\models.py:103
+msgid "Фото 2"
+msgstr "Foto 2"
 
-#: apps/partners/models.py
-msgid "Пользователи партнёров"
-msgstr "Hamkor foydalanuvchilari"
+#: .\apps\cars\models.py:104
+msgid "Фото 3"
+msgstr "Foto 3"
 
-#: apps/partners/models.py
-msgid "Админ-пользователь"
-msgstr "Admin foydalanuvchisi"
+#: .\apps\cars\models.py:105
+msgid "Фото 4"
+msgstr "Foto 4"
 
-#: apps/partners/models.py
-msgid "Связь админ-пользователь ↔ партнёр"
-msgstr "Admin foydalanuvchi ↔ hamkor bogʻlanishi"
+#: .\apps\cars\models.py:109 .\apps\cars\models.py:110
+msgid "Фото автомобиля"
+msgstr "Avtomobil fotosi"
 
-#: apps/partners/models.py
-msgid "Связи админ-пользователь ↔ партнёр"
-msgstr "Admin foydalanuvchi ↔ hamkor bogʻlanishlari"
-
-#: apps/partners/api.py
-msgid "Партнёрский пользователь с таким username не найден."
-msgstr "Ushbu username boʻyicha hamkor foydalanuvchisi topilmadi."
-
-#: apps/partners/api.py
-msgid "Этот username уже привязан к другому Telegram ID."
-msgstr "Ushbu username boshqa Telegram ID bilan allaqachon bogʻlangan."
-
-#: apps/common/choices.py
+#: .\apps\common\choices.py:6 .\apps\partners\models.py:67
 msgid "Активен"
 msgstr "Faol"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:7 .\apps\users\models.py:29
 msgid "Заблокирован"
 msgstr "Bloklangan"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:8
 msgid "Ожидает модерации"
 msgstr "Moderatsiya kutmoqda"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:11
 msgid "Владелец"
 msgstr "Ega"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:12
 msgid "Менеджер"
 msgstr "Menejer"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:15
 msgid "Эконом"
 msgstr "Iqtisod"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:16
 msgid "Комфорт"
 msgstr "Komfort"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:17
 msgid "Бизнес"
 msgstr "Biznes"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:18
 msgid "Премиум"
 msgstr "Premium"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:19
 msgid "Внедорожник"
 msgstr "Yoʻltanlamas"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:20
 msgid "Минивэн"
 msgstr "Miniven"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:23
 msgid "Автомат"
 msgstr "Avtomat"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:24
 msgid "Механика"
 msgstr "Mexanika"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:25
 msgid "Робот"
 msgstr "Robot"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:26
 msgid "Вариатор"
 msgstr "Variator"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:29
 msgid "Бензин"
 msgstr "Benzin"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:30
 msgid "Дизель"
 msgstr "Dizel"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:31
 msgid "Газ"
 msgstr "Gaz"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:32
 msgid "Гибрид"
 msgstr "Gibrid"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:33
 msgid "Электро"
 msgstr "Elektr"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:36
 msgid "Передний"
 msgstr "Oldingi"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:37
 msgid "Задний"
 msgstr "Orqa"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:38
 msgid "Полный"
 msgstr "Toʻliq"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:41
 msgid "Ожидает подтверждения"
 msgstr "Tasdiqlash kutilmoqda"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:42
 msgid "Подтверждена"
 msgstr "Tasdiqlandi"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:43
 msgid "Отклонена"
 msgstr "Rad etildi"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:44
 msgid "Истекло время ожидания"
 msgstr "Kutilish vaqti tugadi"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:45
 msgid "Отменено клиентом"
 msgstr "Mijoz bekor qildi"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:46
 msgid "Авто выдано"
 msgstr "Avto topshirildi"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:47
 msgid "Завершена"
 msgstr "Yakunlandi"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:50
 msgid "Не оплачено"
 msgstr "Toʻlanmagan"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:54
 msgid "Создан"
 msgstr "Yaratildi"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:55
 msgid "Ожидает оплаты"
 msgstr "Toʻlov kutilmoqda"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:56
 msgid "Оплачен"
 msgstr "Toʻlangan"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:57
 msgid "Ошибка оплаты"
 msgstr "Toʻlov xatosi"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:58
 msgid "Возврат"
 msgstr "Qaytarildi"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:61
 msgid "Click"
 msgstr "Click"
 
-#: apps/common/choices.py
+#: .\apps\common\choices.py:62
 msgid "Payme"
 msgstr "Payme"
 
-#: apps/payments/models.py
+#: .\apps\partners\api.py:35
+msgid "Партнёрский пользователь с таким username не найден."
+msgstr "Ushbu username boʻyicha hamkor foydalanuvchisi topilmadi."
+
+#: .\apps\partners\api.py:38
+msgid "Этот username уже привязан к другому Telegram ID."
+msgstr "Ushbu username boshqa Telegram ID bilan allaqachon bogʻlangan."
+
+#: .\apps\partners\models.py:11
+msgid "Название партнёра"
+msgstr "Hamkor nomi"
+
+#: .\apps\partners\models.py:13
+msgid "Отображаемое название компании/ИП"
+msgstr "Kompaniya/YTT ko‘rsatiladigan nomi"
+
+#: .\apps\partners\models.py:16 .\apps\users\models.py:16
+msgid "Телефон"
+msgstr "Telefon"
+
+#: .\apps\partners\models.py:21
+msgid "Email"
+msgstr "Email"
+
+#: .\apps\partners\models.py:35
+msgid "Партнёры"
+msgstr "Hamkorlar"
+
+#: .\apps\partners\models.py:51 .\apps\users\models.py:13
+msgid "Telegram username"
+msgstr "Telegram username"
+
+#: .\apps\partners\models.py:56
+msgid "Без @. Например: webadiko"
+msgstr "@ belgisiz. Masalan: webadiko"
+
+#: .\apps\partners\models.py:59 .\apps\users\models.py:9
+msgid "Telegram user id"
+msgstr "Telegram user id"
+
+#: .\apps\partners\models.py:62
+msgid "Роль"
+msgstr "Roli"
+
+#: .\apps\partners\models.py:71
+msgid "Пользователь партнёра"
+msgstr "Hamkor foydalanuvchisi"
+
+#: .\apps\partners\models.py:72
+msgid "Пользователи партнёров"
+msgstr "Hamkor foydalanuvchilari"
+
+#: .\apps\partners\models.py:90
+msgid "Админ-пользователь"
+msgstr "Admin foydalanuvchisi"
+
+#: .\apps\partners\models.py:98
+msgid "Активна"
+msgstr "Faol"
+
+#: .\apps\partners\models.py:103
+msgid "Связь админ-пользователь ↔ партнёр"
+msgstr "Admin foydalanuvchi ↔ hamkor bogʻlanishi"
+
+#: .\apps\partners\models.py:104
+msgid "Связи админ-пользователь ↔ партнёр"
+msgstr "Admin foydalanuvchi ↔ hamkor bogʻlanishlari"
+
+#: .\apps\partners\translation.py:9
+msgid "-- sorry, no translation provided --"
+msgstr ""
+
+#: .\apps\payments\api.py:28
+msgid "Неверный провайдер оплаты."
+msgstr "Notoʻgʻri toʻlov provayderi."
+
+#: .\apps\payments\api.py:30
+msgid "Сумма должна быть больше нуля."
+msgstr "Miqdor noldan katta bo'lishi kerak."
+
+#: .\apps\payments\api.py:42
+msgid "Бронь уже оплачена."
+msgstr "Bron allaqachon to'langan."
+
+#: .\apps\payments\models.py:19
 msgid "Провайдер"
 msgstr "Provayder"
 
-#: apps/payments/models.py
+#: .\apps\payments\models.py:23
 msgid "Сумма, UZS"
-msgstr "Miqdor, UZS"
+msgstr "Summa, UZS"
 
-#: apps/payments/models.py
+#: .\apps\payments\models.py:26
 msgid "ID счёта/заказа"
 msgstr "Hisob/Buyurtma ID"
 
-#: apps/payments/models.py
+#: .\apps\payments\models.py:27
 msgid "Ссылка на оплату"
 msgstr "Toʻlov havolasi"
 
-#: apps/payments/models.py
+#: .\apps\payments\models.py:30
 msgid "Статус оплаты"
 msgstr "Toʻlov holati"
 
-#: apps/payments/models.py
+#: .\apps\payments\models.py:36
 msgid "Сырой ответ провайдера"
 msgstr "Provayderning xom javobi"
 
-#: apps/payments/models.py
+#: .\apps\payments\models.py:42
 msgid "Платёж"
 msgstr "Toʻlov"
 
-#: apps/payments/models.py
+#: .\apps\payments\models.py:43
 msgid "Платежи"
 msgstr "Toʻlovlar"
 
-#: apps/users/models.py
+#: .\apps\users\models.py:14
+msgid "Без @"
+msgstr "@ yozilmasin"
+
+#: .\apps\users\models.py:19
 msgid "Номер, полученный через request_contact"
 msgstr "request_contact orqali olingan raqam"
 
-#: apps/users/models.py
+#: .\apps\users\models.py:21
 msgid "Имя"
 msgstr "Ism"
 
-#: apps/users/models.py
+#: .\apps\users\models.py:22
 msgid "Фамилия"
 msgstr "Familiya"
 
-#: apps/users/models.py
+#: .\apps\users\models.py:24
 msgid "Язык интерфейса"
 msgstr "Interfeys tili"
 
-#: apps/users/models.py
+#: .\apps\users\models.py:27
 msgid "Коды: uz/ru/en"
 msgstr "Kodlar: uz/ru/en"
 
-#: apps/users/models.py
+#: .\apps\users\models.py:34
 msgid "Пользователь бота"
 msgstr "Bot foydalanuvchisi"
 
-#: apps/users/models.py
+#: .\apps\users\models.py:35
 msgid "Пользователи бота"
 msgstr "Bot foydalanuvchilari"
-
-#: apps/payments/api.py
-msgid "Неверный провайдер оплаты."
-msgstr "Notoʻgʻri toʻlov provayderi."

@@ -167,6 +167,9 @@ PAYTECHUZ = {
 
 LANGUAGE_CODE = "ru"
 LANGUAGES = [("uz", "Oʻzbekcha"), ("ru", "Русский"), ("en", "English")]
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+)
 TIME_ZONE = "Asia/Tashkent"
 USE_I18N = True
 USE_TZ = True
