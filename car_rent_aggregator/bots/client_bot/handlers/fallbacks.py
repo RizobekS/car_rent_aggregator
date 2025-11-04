@@ -8,7 +8,7 @@ from bots.shared.api_client import ApiClient
 from bots.shared.i18n import t, resolve_user_lang
 from bots.client_bot.states import SearchStates, BookingStates
 
-from bots.client_bot.handlers.start import kb_request_phone, kb_legal_consent
+from bots.client_bot.handlers.start import kb_request_phone, kb_legal_consent, kb_language_picker
 from bots.client_bot.handlers.search import build_calendar, kb_class_with_back, kb_confirm_booking
 
 router = Router()
@@ -30,14 +30,12 @@ async def _lang_for(event_user_id: int, state: FSMContext) -> str:
 async def fb_lang_msg(m: Message, state: FSMContext):
     lang = await _lang_for(m.from_user.id, state)
     # Просто повторяем приглашение выбрать язык (клавиатуру покажет хендлер смены языка)
-    from bots.client_bot.handlers.start import kb_language_picker
     await m.answer(t(lang, "start-pick-language"), reply_markup=kb_language_picker())
 
 @router.callback_query(SearchStates.LANG)
 async def fb_lang_cb(c: CallbackQuery, state: FSMContext):
     # Ничего особенного, пусть жмут одну из кнопок выбора языка
     lang = await _lang_for(c.from_user.id, state)
-    from bots.client_bot.handlers.start import kb_language_picker
     await c.message.edit_text(t(lang, "start-pick-language"), reply_markup=kb_language_picker())
     await c.answer()
 
@@ -183,12 +181,49 @@ async def fb_results_cb(c: CallbackQuery, state: FSMContext):
 @router.message(BookingStates.CONFIRM)
 async def fb_booking_confirm_msg(m: Message, state: FSMContext):
     lang = await _lang_for(m.from_user.id, state)
-    # Переотправим клавиатуру подтверждения, текст формировать заново не будем.
-    await m.answer(" ", reply_markup=kb_confirm_booking(lang))
+    # мягко напомним юзеру нажать кнопку
+    await m.answer(
+        t(lang, "book-preview-ask"),
+        reply_markup=kb_confirm_booking(lang)
+    )
 
 @router.callback_query(BookingStates.CONFIRM)
 async def fb_booking_confirm_cb(c: CallbackQuery, state: FSMContext):
-    # Игнорируем любые «левые» коллбэки, чтобы не залипать
+    # если прилетел левый callback, просто гасим "часики"
+    try:
+        await c.answer()
+    except Exception:
+        pass
+
+
+@router.callback_query()
+async def any_other_callback(c: CallbackQuery, state: FSMContext):
+    """
+    Ловим клики по старым/просроченным инлайн-кнопкам, когда FSM уже ушёл
+    в другое состояние или вообще стейт пустой. Вместо того чтобы "зависать",
+    вежливо просим пройти поиск заново.
+    """
+    data = await state.get_data()
+    lang = await _lang_for(c.from_user.id, state)
+
+    # Если стейт ещё валидный (RESULTS/CONFIRM), значит это не наш случай.
+    current_state = await state.get_state()
+    if current_state in (SearchStates.RESULTS.state, BookingStates.CONFIRM.state):
+        # ничего не делаем — это значит, что конкретный callback просто не сматчился
+        try:
+            await c.answer()
+        except Exception:
+            pass
+        return
+
+    # state пустой/устарел -> подсказка
+    try:
+        await c.message.answer(
+            t(lang, "session-expired", menu_find=t(lang, "menu-find"))
+        )
+    except Exception:
+        pass
+
     try:
         await c.answer()
     except Exception:

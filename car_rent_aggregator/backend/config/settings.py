@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "apps.payments",
     "apps.audit",
     "apps.common",
+    "apps.dashboard",
 ]
 
 MIDDLEWARE = [
@@ -64,6 +65,8 @@ MIDDLEWARE = [
 
     "django.contrib.auth.middleware.AuthenticationMiddleware",
 
+    "apps.audit.middleware.RequestAuditMiddleware",
+
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -74,7 +77,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -146,7 +149,7 @@ PAYTECHUZ = {
         "ACCOUNT_FIELD":   "id",
         "AMOUNT_FIELD":    "price_quote",
         "ONE_TIME_PAYMENT": True,
-        "IS_TEST_MODE":    os.environ.get("PAYME_TEST"),
+        "IS_TEST_MODE":    False,
     },
     "CLICK": {
         "SERVICE_ID":       os.environ.get("CLICK_SERVICE_ID"),
@@ -157,7 +160,7 @@ PAYTECHUZ = {
 
         "ACCOUNT_MODEL":    "apps.bookings.models.Booking",
         "COMMISSION_PERCENT": float(os.environ.get("CLICK_COMMISSION", "0")),
-        "IS_TEST_MODE":     os.environ.get("CLICK_TEST"),
+        "IS_TEST_MODE":     False,
     },
 }
 
@@ -206,7 +209,7 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
 
     # Поиск по моделям
-    "search_model": ["bookings.Booking", "cars.Car", "partners.Partner", "users.BotUser"],
+    "search_model": ["bookings.Booking", "cars.Car",],
 
     # Пользовательское меню (правый верхний угол)
     "usermenu_links": [
@@ -219,6 +222,10 @@ JAZZMIN_SETTINGS = {
         {"name": "Главная", "url": "admin:index"},
         # Быстрые фильтры (ссылки на ченджлисты с GET-фильтрами)
         {"name": "Автопарк", "url": "admin:cars_car_changelist"},
+        {
+            "name": "📊 Дашборд",
+            "url": "dashboard-report",
+        },
     ],
 
     # Левое меню: порядок и иконки
@@ -246,11 +253,21 @@ JAZZMIN_SETTINGS = {
         "payments": "fas fa-credit-card",
         "audit": "fas fa-clipboard-check",
         "common": "fas fa-cog",
+
+        "dashboard": "fas fa-chart-line",
+    },
+    "custom_links": {
+        "audit": [{
+                "name": "Обзор и аналитика",
+                "url": "dashboard-report",   # name в urls.py
+                "icon": "fas fa-chart-bar",
+
+        }]
     },
 
     # Секции в левом меню (необязательно; если не задавать — Jazzmin сам разложит)
     "order_with_respect_to": [
-        "partners", "cars", "bookings", "payments", "users", "audit", "auth",
+        "dashboard", "partners", "cars", "bookings", "payments", "users", "audit", "auth",
     ],
 
     # Поведение форм

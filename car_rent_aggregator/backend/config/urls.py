@@ -14,6 +14,8 @@ from apps.users.api import RegisterView, CheckView
 from apps.partners.api import PartnerLinkView
 from apps.payments.webhooks import PaymeWebhookView, ClickWebhookView
 
+from apps.dashboard.views import DashboardReportView, DashboardExportExcelView
+
 from .views import ActivateLanguageView
 
 router = DefaultRouter()
@@ -23,6 +25,8 @@ router.register(r"payments", PaymentViewSet, basename="payments")
 urlpatterns = [
                   path("set_language/<str:lang>/", ActivateLanguageView.as_view(), name="set_language_from_url"),
                   path('i18n/', include('django.conf.urls.i18n')),
+                  path("admin/report/", DashboardReportView.as_view(), name="dashboard-report"),
+                  path("admin/report/export.xlsx", DashboardExportExcelView.as_view(), name="dashboard-export"),
                   path("admin/", admin.site.urls),
                   path("api/", include([
                       path("", include(router.urls)),

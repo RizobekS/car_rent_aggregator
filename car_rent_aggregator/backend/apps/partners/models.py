@@ -27,6 +27,16 @@ class Partner(models.Model):
         choices=PartnerStatus.choices,
         default=PartnerStatus.PENDING
     )
+
+    # 👇 Новое поле: комиссия агрегатора для этого партнёра, %
+    commission_percent = models.DecimalField(
+        _("Комиссия агрегатора, %"),
+        max_digits=5,
+        decimal_places=2,
+        default=0,
+        help_text=_("Сколько % удерживает агрегатор с каждой брони этого партнёра")
+    )
+
     created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Обновлено"), auto_now=True)
 

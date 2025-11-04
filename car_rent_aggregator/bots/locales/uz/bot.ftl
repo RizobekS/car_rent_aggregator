@@ -5,6 +5,54 @@ menu-find = 🔎 Mashina topish
 menu-bookings = 📄 Mening bronlarim
 menu-help = ℹ️ Yordam
 menu-language = 🌐 Til / Language / Язык
+session-expired = Sessiya muddati tugadi. Iltimos, qaytadan "Avtomobil topish" tugmasini bosing va sanalarni tanlang.
+
+# статус в списке "Мои брони"
+status-pending = Tekshiruvda
+status-confirmed = Tasdiqlangan
+status-issued = Rasmiylashtirilgan
+status-paid = To‘langan
+status-canceled = Bekor qilindi
+status-rejected = Rad etilgan
+status-expired = Muddati tugagan
+
+# заголовок "мои брони"
+my-head = Arizalar to‘plami:
+my-no-items = Hozirda sizda ariza mavjud emas. Avtomobil topish uchun, «{ $menu_find }», tugmasini bosing.
+my-line = #{ $id } • { $title } • { $status }\n{ $from_ } → { $to }
+
+my-error = Hatolik: { $error }
+
+# показ после отправки брони партнёру
+book-sent =
+    { $start } dan { $end } gacha "{ $title }" Avtomobilini ijaraga olish uchun ariza yuborildi.
+    Status: Tekshiruvda.
+    Arizangiz bo'yicha qabul qilinganlik yoki rad qilinganligi to‘g‘risida habar beramiz.
+
+book-create-error = Ariza yaratish imkoni bo‘lmadi. Keynroq urunib ko‘ring.\n{ $error }
+
+# превью перед подтверждением клиентом
+book-preview-head = Siz «{ $title }» avtomobilini tanladingiz, { $start }–{ $end }.
+book-preview-sum  = Hisoblangan narx: ≈ { $sum } UZS { $days } kun uchun.
+book-preview-ask  = Tasdiqlaysizmi?
+book-btn-confirm = ✅ Tastiqlash
+book-btn-cancel  = ❌ Bekor qilish
+
+book-cancelled = Ariza bekor qilindi.
+
+errors-missing-dates = Ariza qoldirish uchun ma‘lumotlar etarli emas. Qidiruvni takrorlang.
+
+# choose pay type (оставляем как было)
+pay-choose = To‘lov turini tanlang:\n
+pay-mode-full = To'liq narx
+pay-mode-adv  = Oldindan to‘lov
+pay-choose-full = To‘lov turini tanlang (to‘liq narx):
+pay-choose-adv  = To‘lov turini tanlang (oldindan to‘lov):
+pay-gw-picked = Siz to‘lov turi uchun { $gw } ({ $mode }) ni tanladingiz.\nSizning ariza raqamingiz: #{ $bid }.
+pay-instruction = To‘lov sahifasiga o‘tish uchun, To‘lash tugmasini bosing.
+pay-go = 💳 To‘lash
+pay-no-link = To‘lash uchun havola topilmadi.
+pay-back = Ortga
 
 label-class = Klass: { $value }
 label-drive = Privod: { $value }
@@ -134,6 +182,8 @@ my-no-items = Sizda hozircha bronlar yo‘q. Birinchi bronni rasmiylashtirish uc
 my-error = Bronlar ro‘yxatini yuklab bo‘lmadi: { $error }
 my-head = Bronlaringiz:
 my-line = #{ $id } • { $title } • { $status }\n{ $from_ } → { $to }
+
+status-paid = ✅ #{id} ("{$title}") so'rovi uchun to'lov qabul qilindi. Rahmat!
 
 pay-choose-full = To‘liq to‘lov uchun to‘lov tizimini tanlang:
 pay-choose-adv = Oldindan to‘lov uchun to‘lov tizimini tanlang:

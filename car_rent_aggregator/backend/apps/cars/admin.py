@@ -1,9 +1,9 @@
+# apps/cars/admin.py
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import PermissionDenied
 from apps.partners.models import PartnerAdminLink
-
-from .models import Car, CarCalendar, CarImages
+from .models import Car, CarCalendar, CarImages, Region
 
 PARTNER_GROUP = "Partners"  # имя группы для партнёрских админов
 
@@ -36,20 +36,35 @@ class CarImagesInline(admin.StackedInline):
     verbose_name = _("Фотографии")
     verbose_name_plural = _("Фотографии")
 
+
+@admin.register(Region)
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ("id", "name")
+    search_fields = ("name",)
+
+
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
     list_display = (
-        "id", "title", "partner", "car_class", "gearbox",
+        "id", "title", "partner", "plate_number", "region",
+        "car_class", "gearbox",
         "drive_type", "fuel_type", "mileage_km",
         "price_weekday", "price_weekend", "active"
     )
-    list_filter  = ("active", "car_class", "gearbox", "drive_type", "fuel_type", "partner")
-    search_fields = ("id", "title", "partner__name", "make", "model", "color")
+    list_filter  = ("active", "car_class", "gearbox", "drive_type", "fuel_type", "region", "partner")
+    search_fields = ("id", "title", "partner__name", "make", "model", "color", "plate_number")
     inlines = [CarImagesInline]
 
     fieldsets = (
         (_("Общее"), {
-            "fields": ("partner", "title", "make", "model", "year", "car_class", "gearbox", "drive_type", "active")
+            "fields": (
+                "partner",
+                "region",
+                "plate_number",
+                "title", "make", "model", "year",
+                "car_class", "gearbox", "drive_type",
+                "active",
+            )
         }),
         (_("Технические данные"), {
             "fields": (
@@ -62,14 +77,16 @@ class CarAdmin(admin.ModelAdmin):
             "fields": (
                 "price_weekday", "price_weekend",
                 "deposit_band", "deposit_amount",
-                "limit_km", "insurance_included", "child_seat", "delivery", "car_with_driver",
+                "limit_km",
+                "insurance_included", "child_seat",
+                "delivery", "car_with_driver",
             )
         }),
     )
 
-    # ↓ партнёрские ограничения (оставил как у тебя)
+    # ограничение видимости по партнёру
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
+        qs = super().get_queryset(request).select_related("partner", "region")
         if is_partner_admin(request):
             ids = partner_ids_for_user(request)
             return qs.filter(partner_id__in=ids) if ids else qs.none()
@@ -101,18 +118,18 @@ class CarAdmin(admin.ModelAdmin):
             if not allowed:
                 raise PermissionDenied(_("У вас нет привязанных партнёров. Обратитесь к администратору."))
             if not change:
+                # создаём новую машину
                 if obj.partner_id not in allowed:
                     if len(allowed) == 1:
                         obj.partner_id = next(iter(allowed))
                     else:
                         raise PermissionDenied(_("Нельзя выбрать этого партнёра."))
             else:
+                # редактируем существующую машину
                 if "partner" in form.changed_data and obj.partner_id not in allowed:
                     raise PermissionDenied(_("Нельзя менять владельца автомобиля."))
         super().save_model(request, obj, form, change)
 
-
-# ───────────────────────── CarCalendar ─────────────────────────
 
 @admin.register(CarCalendar)
 class CarCalendarAdmin(admin.ModelAdmin):
@@ -166,6 +183,3 @@ class CarCalendarAdmin(admin.ModelAdmin):
         if is_partner_admin(request) and obj is not None:
             return obj.car.partner_id in set(partner_ids_for_user(request))
         return True
-
-
-

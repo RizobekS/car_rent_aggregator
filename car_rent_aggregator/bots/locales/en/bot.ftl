@@ -7,6 +7,55 @@ menu-help = ℹ️ Help
 menu-language = 🌐 Language / Til / Язык
 label-class = Class: { $value }
 label-drive = Drive: { $value }
+session-expired = The session has expired. Please click "Find a car" again and select dates.
+
+# статус в списке "Мои брони"
+status-pending = Pending
+status-confirmed = Confirmed
+status-issued = Issued
+status-paid = Paid
+status-canceled = Canceled
+status-rejected = Rejected
+status-expired = Expired
+
+# заголовок "мои брони"
+my-head = List of your bookings:
+my-no-items = You have no active bookings. Click "{ $menu_find }" to search for a car.
+my-line = #{ $id } • { $title } • { $status }\n{ $from_ } → { $to }
+
+my-error = Error: { $error }
+
+# показ после отправки брони партнёру
+book-sent =
+    A request for car rental "{ $title }"
+    from { $start } to { $end } has been sent.
+    Status: Pending.
+    You will receive a notification upon approval or rejection.
+
+book-create-error = Failed to create request. Please try again later.\n{ $error }
+
+# превью перед подтверждением клиентом
+book-preview-head = You have selected "{ $title }", { $start }–{ $end }.
+book-preview-sum  = Approximately: ≈ { $sum } UZS for { $days } days.
+book-preview-ask  = Send a request to a partner?
+book-btn-confirm = ✅ Send
+book-btn-cancel  = ❌ Cancel
+
+book-cancelled = Canceled.
+
+errors-missing-dates = Not enough information to make a reservation. Please search again.
+
+# choose pay type (оставляем как было)
+pay-choose = Select payment type:\n
+pay-mode-full = total amount
+pay-mode-adv  = advance payment
+pay-choose-full = Select payment method (full amount):
+pay-choose-adv  = Select payment method (advance payment):
+pay-gw-picked = You have chosen to pay via { $gw } ({ $mode }).\nYour bid number: #{ $bid }.
+pay-instruction = Click the button to go to the payment page.
+pay-go = 💳 Pay
+pay-no-link = Unable to retrieve payment link.
+pay-back = Back
 
 lang-set-ok =
     { $done ->
@@ -122,6 +171,9 @@ my-no-items = You have no bookings yet. Use “{$menu-find}” to make your firs
 my-error = Failed to load bookings: { $error }
 my-head = Your bookings:
 my-line = #{ $id } • { $title } • { $status }\n{ $from_ } → { $to }
+
+
+status-paid = ✅ Payment for request #{id} ("{$title}") has been received. Thank you!
 
 pay-choose-full = Choose a payment provider for full payment:
 pay-choose = Select payment type:

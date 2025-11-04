@@ -5,6 +5,22 @@ from apps.partners.models import Partner
 from apps.common.choices import CarClass, Gearbox, FuelType, DriveType
 
 
+class Region(models.Model):
+    """
+    Регион регистрации авто (Ташкент, Самарканд и т.д.).
+    Через modeltranslation потом можно локализовать название.
+    """
+    name = models.CharField(_("Регион"), max_length=100, unique=True)
+
+    class Meta:
+        verbose_name = _("Регион")
+        verbose_name_plural = _("Регионы")
+        ordering = ("name",)
+
+    def __str__(self):
+        return self.name
+
+
 class Car(models.Model):
     """Карточка автомобиля в автопарке партнёра."""
     partner = models.ForeignKey(
@@ -13,8 +29,32 @@ class Car(models.Model):
         on_delete=models.CASCADE,
         related_name="cars"
     )
-    title = models.CharField(_("Название автомобиля для клиента"), max_length=200,
-                             help_text=_("Напр.: Chevrolet Cobalt 2022"))
+
+    # 🔹 Новый FK на регион
+    region = models.ForeignKey(
+        Region,
+        verbose_name=_("Регион автомобиля"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="cars",
+        help_text=_("Где зарегистрирована машина (Ташкент, Самарканд и т.п.)")
+    )
+
+    # 🔹 Гос. номер
+    plate_number = models.CharField(
+        _("Госномер"),
+        max_length=32,
+        unique=True,
+        null=True,
+        help_text=_("Например: 01A123BC")
+    )
+
+    title = models.CharField(
+        _("Название автомобиля для клиента"),
+        max_length=200,
+        help_text=_("Напр.: Chevrolet Cobalt 2022")
+    )
     make  = models.CharField(_("Марка автомобиля"), max_length=100)
     model = models.CharField(_("Модель автомобиля"), max_length=100)
     year  = models.PositiveSmallIntegerField(_("Год выпуска"))
@@ -24,15 +64,31 @@ class Car(models.Model):
 
     # ---- новые поля ТЗ ----
     mileage_km = models.PositiveIntegerField(_("Пробег, км"), default=0)
-    engine_volume_l = models.DecimalField(_("Объём двигателя, л"), max_digits=4, decimal_places=1,
-                                          null=True, blank=True)
+    engine_volume_l = models.DecimalField(
+        _("Объём двигателя, л"),
+        max_digits=4,
+        decimal_places=1,
+        null=True, blank=True
+    )
     horsepower_hp   = models.PositiveIntegerField(_("Мощность, л.с."), null=True, blank=True)
-    fuel_type       = models.CharField(_("Тип топлива"), max_length=10, choices=FuelType.choices,
-                                       null=True, blank=True)
-    fuel_consumption_l_per_100km = models.DecimalField(_("Расход, л/100 км"), max_digits=5, decimal_places=2,
-                                                       null=True, blank=True)
-    drive_type = models.CharField(_("Привод"), max_length=10, choices=DriveType.choices,
-                                  null=True, blank=True)
+    fuel_type       = models.CharField(
+        _("Тип топлива"),
+        max_length=10,
+        choices=FuelType.choices,
+        null=True, blank=True
+    )
+    fuel_consumption_l_per_100km = models.DecimalField(
+        _("Расход, л/100 км"),
+        max_digits=5,
+        decimal_places=2,
+        null=True, blank=True
+    )
+    drive_type = models.CharField(
+        _("Привод"),
+        max_length=10,
+        choices=DriveType.choices,
+        null=True, blank=True
+    )
     color      = models.CharField(_("Цвет"), max_length=50, blank=True)
     insurance_included = models.BooleanField(_("Страховка включена"), default=False)
     child_seat = models.BooleanField(_("Детское кресло"), default=False)
@@ -42,13 +98,22 @@ class Car(models.Model):
     price_weekend = models.DecimalField(_("Цена в выходные, UZS"), max_digits=12, decimal_places=2)
 
     deposit_band = models.CharField(
-        _("Диапазон залога"), max_length=10,
-        choices=[("none", _("Без залога")), ("low", _("Низкий залог")), ("high", _("Высокий залог"))],
+        _("Диапазон залога"),
+        max_length=10,
+        choices=[
+            ("none", _("Без залога")),
+            ("low", _("Низкий залог")),
+            ("high", _("Высокий залог")),
+        ],
         default="low"
     )
-    deposit_amount = models.DecimalField(_("Сумма аванса, UZS"), max_digits=12, decimal_places=2,
-                                         null=True, blank=True,
-                                         help_text=_("Если фиксированная сумма, иначе оставьте пустым"))
+    deposit_amount = models.DecimalField(
+        _("Сумма аванса, UZS"),
+        max_digits=12,
+        decimal_places=2,
+        null=True, blank=True,
+        help_text=_("Если фиксированная сумма, иначе оставьте пустым")
+    )
     limit_km = models.PositiveIntegerField(_("Суточный лимит, км"), default=200)
     delivery = models.BooleanField(_("Доставка авто возможна"), default=False)
     car_with_driver = models.BooleanField(_("Автомобиль с водителем"), default=False)
@@ -66,6 +131,7 @@ class Car(models.Model):
         indexes = [
             models.Index(fields=["partner", "active"]),
             models.Index(fields=["car_class", "gearbox"]),
+            models.Index(fields=["plate_number"]),
         ]
 
     def __str__(self):
@@ -74,12 +140,21 @@ class Car(models.Model):
 
 class CarCalendar(models.Model):
     """Диапазоны занятости автомобиля (для блокировки дат)."""
-    car = models.ForeignKey(Car, verbose_name=_("Автомобиль"),
-                            on_delete=models.CASCADE, related_name="calendar")
+    car = models.ForeignKey(
+        Car,
+        verbose_name=_("Автомобиль"),
+        on_delete=models.CASCADE,
+        related_name="calendar"
+    )
     date_from = models.DateTimeField(_("Занят с"))
     date_to   = models.DateTimeField(_("Занят по"))
-    status = models.CharField(_("Статус"), max_length=10,
-                              choices=[("busy", _("Занято"))], default="busy", db_index=True)
+    status = models.CharField(
+        _("Статус"),
+        max_length=10,
+        choices=[("busy", _("Занято"))],
+        default="busy",
+        db_index=True
+    )
     created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
 
     class Meta:
