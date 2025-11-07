@@ -34,22 +34,29 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
         booking = Booking.objects.get(pk=validated.pop("booking_id"))
         provider = validated["provider"]
 
-        # 1) пытаемся найти существующую запись (она у нас One-to-One на брони)
-        payment = Payment.objects.filter(booking=booking).first()
+        # 1) находим или создаём платёж
+        payment, _ = Payment.objects.get_or_create(
+            booking=booking,
+            defaults={
+                "status": PaymentStatus.PENDING,
+                "amount": validated["amount"],
+                "currency": validated.get("currency", "UZS"),
+                "provider": provider,
+            },
+        )
 
-        # уже оплачено — новая ссылка не нужна
-        if payment and payment.status == PaymentStatus.PAID:
-            raise serializers.ValidationError({"detail": _("Бронь уже оплачена.")}, code="already_paid")
+        # если был, обновим сумму/провайдера
+        if payment.status != PaymentStatus.PAID:
+            payment.amount = validated["amount"]
+            payment.provider = provider
+            payment.status = PaymentStatus.PENDING
+            payment.save(update_fields=["amount", "provider", "status"])
 
-        # если нет — создаём пустую (не вставляем ссылку сразу)
-        if not payment:
-            payment = Payment(booking=booking, status=PaymentStatus.PENDING)
-
-        # 2) генерим инвойс
+        # 2) генерим invoice_id
         ts = int(timezone.now().timestamp())
-        invoice_id = f"{provider}-{booking.pk}-{ts}"
+        invoice_id = f"{provider}-{payment.pk}-{ts}"
 
-        # 3) запрашиваем реальную ссылку у провайдера
+        # 3) теперь ID уже есть → формируем ссылку
         real_url = ""
         raw_meta = payment.raw_meta or {}
 
@@ -63,6 +70,7 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
                     secret_key=cfg["SECRET_KEY"],
                     is_test_mode=cfg["IS_TEST_MODE"],
                 )
+                # ✅ передаём ID платежа, а не брони
                 res = gw.create_payment(
                     id=payment.id,
                     amount=int(validated["amount"]),
@@ -79,29 +87,26 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
                     is_test_mode=cfg["IS_TEST_MODE"],
                 )
                 res = gw.create_payment(
-                    id=booking.id,
+                    id=booking.id,  # для Payme оставляем booking.id
                     amount=int(validated["amount"]) * 100,
                     return_url=settings.BOT_PAY_RETURN_URL,
                 )
                 raw_meta.update({"payme_create": res} if isinstance(res, dict) else {})
                 real_url = (
-                    (res.get("payment_url") or res.get("link", "")) if isinstance(res, dict)
-                    else str(res or "")
-                ) or ""
+                               (res.get("payment_url") or res.get("link", "")) if isinstance(res, dict)
+                               else str(res or "")
+                           ) or ""
         except Exception as e:
             log.exception("create_payment failed for %s (booking=%s): %s", provider, booking.id, e)
             raw_meta["error"] = str(e)
             real_url = ""
 
-        # 4) сохраняем/обновляем платёж (без создания дубликата)
-        payment.provider = provider
-        payment.amount   = validated["amount"]
-        payment.currency = validated.get("currency") or payment.currency or "UZS"
+        # 4) сохраняем всё
         payment.invoice_id = invoice_id
         payment.raw_meta = {"provider_url": real_url, **(raw_meta or {})}
-        payment.status = PaymentStatus.PENDING
-        payment.pay_url = ""   # короткую ссылку подставим во ViewSet
-        payment.save()
+        payment.pay_url = ""
+        payment.save(update_fields=["invoice_id", "raw_meta", "pay_url"])
+
         return payment
 
 
