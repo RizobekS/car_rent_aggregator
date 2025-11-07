@@ -64,7 +64,7 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
                     is_test_mode=cfg["IS_TEST_MODE"],
                 )
                 res = gw.create_payment(
-                    id=booking.id,
+                    id=payment.id,
                     amount=int(validated["amount"]),
                     return_url=settings.BOT_PAY_RETURN_URL,
                 )
