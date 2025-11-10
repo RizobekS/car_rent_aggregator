@@ -118,6 +118,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 class PaymentViewSet(viewsets.GenericViewSet):
     queryset = Payment.objects.select_related("booking")
+    serializer_class = PaymentSerializer
     # permission_classes = (BotOnlyPermission,)
 
     def create(self, request, *args, **kwargs):
