@@ -1,163 +1,166 @@
 # apps/payments/webhooks.py
 from __future__ import annotations
-
+import json
 import logging
 from decimal import Decimal
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
-from paytechuz.integrations.django.webhooks import (
-    PaymeWebhook as BasePaymeWebhookView,
-    ClickWebhook as BaseClickWebhookView,
-    InvalidAmount,
+from paytechuz.integrations.django.views import (
+    BaseClickWebhookView as PTUBaseClickView,
+    BasePaymeWebhookView as PTUBasePaymeView,
 )
-
-from apps.bookings.models import Booking
 from .models import Payment
-from apps.common.choices import PaymentStatus, PaymentMarker
+from apps.common.choices import PaymentStatus
 
-log = logging.getLogger(__name__)
-
-
-# ────────────────────────── helpers ──────────────────────────
-
-def _last_pending_payment_for_booking(booking_id: int, provider: str) -> Payment | None:
-    """Последний незавершённый платёж по брони и провайдеру."""
-    return (
-        Payment.objects
-        .filter(booking_id=booking_id, provider=provider, status=PaymentStatus.PENDING)
-        .order_by("-id")
-        .first()
-    )
+logger = logging.getLogger(__name__)
 
 
-def _mark_booking_paid(payment: Payment) -> None:
-    """Пометить бронь оплаченной, если связана с платежом."""
-    try:
-        if payment.booking:
-            # если у вас есть явные поля/статусы — обновите здесь
-            # пример: payment.booking.payment_marker = "paid"
-            payment.booking.payment_marker = "paid"
-            payment.booking.save(update_fields=["payment_marker"])
-    except Exception as e:
-        log.warning("Failed to mark booking paid (payment %s): %s", payment.id, e)
+def _parse_params(request: HttpRequest) -> dict:
+    """
+    Click присылает form-urlencoded. На всякий случай поддержим и JSON для локальных тестов.
+    """
+    if request.content_type and "application/json" in request.content_type.lower():
+        try:
+            return json.loads(request.body.decode("utf-8")) or {}
+        except Exception:
+            return {}
+    # стандартный путь:
+    return request.POST.dict() if request.method == "POST" else {}
 
-
-def _mark_booking_unpaid(payment: Payment) -> None:
-    """Снять флаги оплаты у брони при отмене платежа (если нужно)."""
-    try:
-        if payment.booking:
-            # пример: payment.booking.payment_marker = "unpaid"
-            payment.booking.payment_marker = "unpaid"
-            payment.booking.save(update_fields=["payment_marker"])
-    except Exception as e:
-        log.warning("Failed to mark booking unpaid (payment %s): %s", payment.id, e)
-
-
-# ────────────────────────── PAYME ──────────────────────────
 
 @method_decorator(csrf_exempt, name="dispatch")
-class PaymeWebhookView(BasePaymeWebhookView):
+class PaymeWebhookView(PTUBasePaymeView):
     """
-    Кастомизация Payme:
-      - валидируем сумму по последнему Payment(PENDING, provider='payme') в тийинах,
-      - подтверждаем/отменяем платёж и обновляем бронь.
+    Payme: переопределяем события, чтобы обновлять наши Payment/Booking.
+    Бизнес-логика:
+      - успешная оплата: Payment.status = SUCCESS, Booking.payment_status = paid (если есть связь)
+      - отмена: Payment.status = CANCELED
     """
 
-    def _validate_amount(self, account, received_tiyin: int) -> None:
-        """
-        Вызывается базовым классом при CheckPerform/Create/Perform.
-        account — это Booking (так как ACCOUNT_MODEL = Booking).
-        """
-        booking_id = getattr(account, "id", None)
-        if not booking_id:
-            raise InvalidAmount("Incorrect amount. Booking id is missing")
+    def successfully_payment(self, params, transaction):
+        try:
+            payment_id = transaction.account_id  # в Payme мы кладем id платежа в account_id
+            pay: Payment = Payment.objects.select_related("booking").get(pk=payment_id)
 
-        pay = _last_pending_payment_for_booking(booking_id, provider="payme")
-        if not pay or pay.amount is None:
-            raise InvalidAmount("Incorrect amount. Pending payment amount is not set")
+            # финализируем платеж
+            pay.status = PaymentStatus.SUCCESS
+            pay.provider_ref = str(transaction.transaction_id)
+            pay.raw_provider_response = {
+                "payme": {"result": "success", "params": params}
+            }
+            pay.save(update_fields=["status", "provider_ref", "raw_provider_response"])
 
-        expected_tiyin = int(Decimal(pay.amount) * 100)  # суммы Payme — в тийинах
-        received_tiyin = int(Decimal(received_tiyin))
+            # помечаем бронь (если есть)
+            if pay.booking_id:
+                pay.booking.mark_paid_by_payment(pay)  # сделай у Booking такой метод, если ещё нет
+        except Payment.DoesNotExist:
+            logger.error("Payme: Payment %s not found on success", transaction.account_id)
+        except Exception as e:
+            logger.exception("Payme successfully_payment handler failed: %s", e)
 
-        if expected_tiyin != received_tiyin:
-            raise InvalidAmount(f"Incorrect amount. Expected: {expected_tiyin}, received: {received_tiyin}")
+    def cancelled_payment(self, params, transaction):
+        try:
+            payment_id = transaction.account_id
+            pay: Payment = Payment.objects.get(pk=payment_id)
+            pay.status = PaymentStatus.CANCELED
+            pay.raw_provider_response = {
+                "payme": {"result": "canceled", "params": params}
+            }
+            pay.save(update_fields=["status", "raw_provider_response"])
 
-    # Документация PayTechUz: эти методы вызываются на финальных шагах
-    def successfully_payment(self, transaction, account):
-        """
-        Подтверждённая оплата Payme.
-        """
-        booking_id = getattr(account, "id", None)
-        pay = _last_pending_payment_for_booking(booking_id, provider="payme")
-        if pay:
-            pay.status = PaymentStatus.PAID
-            pay.raw_meta = (pay.raw_meta or {}) | {"payme": transaction.raw_data or {}}
-            pay.save(update_fields=["status", "raw_meta"])
-            _mark_booking_paid(pay)
-
-        log.info("✅ Payme: successful payment for booking %s", booking_id)
-        return JsonResponse(self.response_success(transaction), status=200)
-
-    def cancelled_payment(self, transaction, account):
-        """
-        Отменённая оплата Payme.
-        """
-        booking_id = getattr(account, "id", None)
-        pay = _last_pending_payment_for_booking(booking_id, provider="payme")
-        if pay:
-            pay.status = PaymentStatus.CANCELLED
-            pay.raw_meta = (pay.raw_meta or {}) | {"payme": transaction.raw_data or {}}
-            pay.save(update_fields=["status", "raw_meta"])
-            _mark_booking_unpaid(pay)
-
-        log.warning("❌ Payme: cancelled payment for booking %s", booking_id)
-        return JsonResponse(self.response_success(transaction), status=200)
+            if pay.booking_id:
+                pay.booking.mark_payment_canceled(pay)
+        except Payment.DoesNotExist:
+            logger.error("Payme: Payment %s not found on cancel", transaction.account_id)
+        except Exception as e:
+            logger.exception("Payme cancelled_payment handler failed: %s", e)
 
 
-# ─────────────────────────── Click ───────────────────────────
 @method_decorator(csrf_exempt, name="dispatch")
-class ClickWebhookView(BaseClickWebhookView):
+class ClickWebhookView(PTUBaseClickView):
     """
-    Обработчик Click:
-      - ACCOUNT_MODEL указывает на Payment,
-      - базовый класс PayTechUz сверяет сумму по Payment.amount,
-      - мы только помечаем статусы Payment и обновляем связанную бронь.
+    Click: добавляем обновление наших моделей и поддерживаем JSON для локальных тестов.
+    BaseClickWebhookView из PayTechUZ уже:
+      - валидирует подпись
+      - ведёт Prepare/Complete/повторы
+      - создаёт/обновляет PaymentTransaction
+    Мы здесь:
+      - парсим параметры корректно
+      - синхронизируемся с нашей таблицей Payment
     """
 
-    def successfully_payment(self, transaction, account):
+    def post(self, request: HttpRequest, **kwargs):
+        # подменим чтение параметров, чтобы и JSON работал в локалке
+        params = _parse_params(request)
+        request.POST = request.POST.copy()  # на всякий случай, чтобы dict был мутабельный
+        for k, v in params.items():
+            request.POST[k] = v
+        return super().post(request, **kwargs)
+
+    def _get_payment(self, merchant_trans_id: str | int) -> Payment | None:
+        try:
+            return Payment.objects.select_related("booking").get(pk=int(merchant_trans_id))
+        except Exception:
+            logger.error("Click: Payment %s not found", merchant_trans_id)
+            return None
+
+    def transaction_created(self, params, transaction, account):
         """
-        account — это Payment (ACCOUNT_MODEL = apps.payments.models.Payment).
+        Prepare прошёл: сохраним «черновик» провайдера у нашего платежа.
         """
         try:
-            payment: Payment = account
-            payment.status = PaymentStatus.PAID
-            payment.raw_meta = (payment.raw_meta or {}) | {"click": transaction.raw_data or {}}
-            payment.save(update_fields=["status", "raw_meta"])
-            _mark_booking_paid(payment)
-            log.info("✅ Click: successful payment for payment=%s booking=%s",
-                     payment.id, getattr(payment.booking, "id", None))
+            pay = self._get_payment(params.get("merchant_trans_id"))
+            if not pay:
+                return
+            raw = pay.raw_provider_response or {}
+            raw["click_prepare"] = {"params": params, "transaction_id": transaction.transaction_id}
+            pay.raw_provider_response = raw
+            pay.save(update_fields=["raw_provider_response"])
         except Exception as e:
-            log.exception("Click successfully_payment error: %s", e)
+            logger.exception("Click transaction_created handler failed: %s", e)
 
-        # стандартный успешный ответ Click
-        return JsonResponse(self.response_success(transaction), status=200)
-
-    def cancelled_payment(self, transaction, account):
+    def successfully_payment(self, params, transaction):
         """
-        Отмена Click.
+        Complete прошёл: отметить SUCCESS и бронь как оплаченную.
         """
         try:
-            payment: Payment = account
-            payment.status = PaymentStatus.CANCELLED
-            payment.raw_meta = (payment.raw_meta or {}) | {"click": transaction.raw_data or {}}
-            payment.save(update_fields=["status", "raw_meta"])
-            _mark_booking_unpaid(payment)
-            log.warning("❌ Click: cancelled payment for payment=%s booking=%s",
-                        payment.id, getattr(payment.booking, "id", None))
-        except Exception as e:
-            log.exception("Click cancelled_payment error: %s", e)
+            merchant_trans_id = params.get("merchant_trans_id") or transaction.account_id
+            pay = self._get_payment(merchant_trans_id)
+            if not pay:
+                return
 
-        return JsonResponse(self.response_success(transaction), status=200)
+            pay.status = PaymentStatus.SUCCESS
+            pay.provider_ref = str(transaction.transaction_id)
+            raw = pay.raw_provider_response or {}
+            raw["click_complete"] = {"result": "success", "params": params}
+            pay.raw_provider_response = raw
+            pay.save(update_fields=["status", "provider_ref", "raw_provider_response"])
+
+            if pay.booking_id:
+                pay.booking.mark_paid_by_payment(pay)
+        except Exception as e:
+            logger.exception("Click successfully_payment handler failed: %s", e)
+
+    def cancelled_payment(self, params, transaction):
+        """
+        Complete с ошибкой: отметить CANCELED.
+        """
+        try:
+            merchant_trans_id = params.get("merchant_trans_id") or transaction.account_id
+            pay = self._get_payment(merchant_trans_id)
+            if not pay:
+                return
+
+            pay.status = PaymentStatus.CANCELED
+            raw = pay.raw_provider_response or {}
+            raw["click_complete"] = {"result": "canceled", "params": params}
+            pay.raw_provider_response = raw
+            pay.save(update_fields=["status", "raw_provider_response"])
+
+            if pay.booking_id:
+                pay.booking.mark_payment_canceled(pay)
+        except Exception as e:
+            logger.exception("Click cancelled_payment handler failed: %s", e)
