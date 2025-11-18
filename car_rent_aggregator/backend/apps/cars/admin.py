@@ -79,29 +79,29 @@ class CarImagesInline(admin.StackedInline):
 class CarAdmin(admin.ModelAdmin):
     list_display = (
         "id", "title", "partner", "plate_number", "region",
-        "mark", "new_model", "new_color",
+        "mark", "model", "color",
         "car_class", "gearbox", "drive_type",
         "price_weekday", "price_weekend",
         "active",
     )
     list_filter  = (
         "active", "car_class", "gearbox", "drive_type",
-        "fuel_type", "region", "partner", "mark", "new_model", "new_color",
+        "fuel_type", "region", "partner", "mark", "model", "color",
     )
     search_fields = (
         "id", "title",
         "partner__name",
-        "mark__name", "new_model__name",
-        "new_color__name",
+        "mark__name", "model__name",
+        "color__name",
         "plate_number",
     )
     list_select_related = (
-        "partner", "region", "mark", "new_model", "new_color",
+        "partner", "region", "mark", "model", "color",
     )
-    ordering = ("partner", "mark__name", "new_model__name")
+    ordering = ("partner", "mark__name", "model__name")
 
     # FK-ы через автодополнение
-    autocomplete_fields = ("partner", "region", "mark", "new_model", "new_color")
+    autocomplete_fields = ("partner", "region", "mark", "model", "color")
 
     inlines = [CarImagesInline]
 
@@ -112,7 +112,7 @@ class CarAdmin(admin.ModelAdmin):
                 "region",
                 "plate_number",
                 "title",
-                "mark", "new_model",
+                "mark", "model",
                 "year",
                 "car_class", "gearbox", "drive_type",
                 "active",
@@ -120,7 +120,7 @@ class CarAdmin(admin.ModelAdmin):
         }),
         (_("Технические данные"), {
             "fields": (
-                "mileage_km", "new_color",
+                "mileage_km", "color",
                 "engine_volume_l", "horsepower_hp",
                 "fuel_type", "fuel_consumption_l_per_100km",
             )
