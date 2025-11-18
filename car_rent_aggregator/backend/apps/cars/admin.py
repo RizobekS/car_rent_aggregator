@@ -1,7 +1,10 @@
 # apps/cars/admin.py
+from dal import autocomplete
+from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import PermissionDenied
+
 from apps.partners.models import PartnerAdminLink
 from .models import (
     Car, CarCalendar, CarImages, Region,
@@ -20,6 +23,7 @@ def is_partner_admin(request) -> bool:
         and request.user.is_staff
         and request.user.groups.filter(name=PARTNER_GROUP).exists()
     )
+
 
 def partner_ids_for_user(request):
     return list(
@@ -63,6 +67,53 @@ class ModelCarAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "updated_at")
 
 
+# ───────────────────────── Форма для Car с зависимой моделью ─────────────────────────
+
+class CarAdminForm(forms.ModelForm):
+    """
+    Форма для Car:
+      - поле `model` показывает только модели выбранной марки.
+      - если марка не выбрана: при редактировании берём из instance,
+        при первом открытии формы — список моделей пустой, чтобы не засорять выбор.
+    """
+
+    class Meta:
+        model = Car
+        fields = "__all__"
+        widgets = {
+            "model": autocomplete.ModelSelect2(
+                url="model-car-autocomplete",
+                forward=["mark"],
+                attrs={"data-placeholder": "---------"}
+            ),
+        }
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+            data = self.data or {}
+            mark_id = data.get("mark") or (self.instance.mark_id if getattr(self.instance, "pk", None) else None)
+
+            if mark_id:
+                self.fields["model"].queryset = (
+                    ModelCar.objects
+                    .filter(mark_id=mark_id)
+                    .order_by("name", "id")
+                )
+            else:
+                # Нет выбранного блока — список секций пуст
+                self.fields["model"].queryset = ModelCar.objects.none()
+
+        def clean(self):
+            cleaned = super().clean()
+            mark = cleaned.get("mark")
+            model = cleaned.get("model")
+            # 2) Страховка: если пользователь как-то выбрал «чужую» секцию — отклоняем
+            if mark and model and model.mark_id != mark.id:
+                self.add_error("section", "Модель машины не принадлежит выбранной марке.")
+            return cleaned
+
+
 # ───────────────────────── Car + Images ─────────────────────────
 
 class CarImagesInline(admin.StackedInline):
@@ -77,6 +128,8 @@ class CarImagesInline(admin.StackedInline):
 
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
+    form = CarAdminForm  # ← используем форму с зависимым полем model
+
     list_display = (
         "id", "title", "partner", "plate_number", "region",
         "mark", "model", "color",
@@ -84,7 +137,7 @@ class CarAdmin(admin.ModelAdmin):
         "price_weekday", "price_weekend",
         "active",
     )
-    list_filter  = (
+    list_filter = (
         "active", "car_class", "gearbox", "drive_type",
         "fuel_type", "region", "partner", "mark", "model", "color",
     )
@@ -101,7 +154,8 @@ class CarAdmin(admin.ModelAdmin):
     ordering = ("partner", "mark__name", "model__name")
 
     # FK-ы через автодополнение
-    autocomplete_fields = ("partner", "region", "mark", "model", "color")
+    # ВАЖНО: убираем model из autocomplete, чтобы работала фильтрация по mark
+    autocomplete_fields = ("partner", "region", "mark", "color")
 
     inlines = [CarImagesInline]
 
@@ -148,7 +202,10 @@ class CarAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "partner" and is_partner_admin(request):
             ids = partner_ids_for_user(request)
-            kwargs["queryset"] = db_field.related_model.objects.filter(pk__in=ids) if ids else db_field.related_model.objects.none()
+            kwargs["queryset"] = (
+                db_field.related_model.objects.filter(pk__in=ids)
+                if ids else db_field.related_model.objects.none()
+            )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_readonly_fields(self, request, obj=None):

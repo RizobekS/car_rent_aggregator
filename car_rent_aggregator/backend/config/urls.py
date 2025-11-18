@@ -17,12 +17,15 @@ from apps.payments.webhooks import PaymeWebhookView, ClickWebhookView
 from apps.dashboard.views import DashboardReportView, DashboardExportExcelView
 
 from .views import ActivateLanguageView
+from apps.cars.autocomplete import ModelCarAutocomplete
 
 router = DefaultRouter()
 router.register(r"bookings", BookingViewSet, basename="bookings")
 router.register(r"payments", PaymentViewSet, basename="payments")
 
 urlpatterns = [
+                  path("admin/museum/model-car-autocomplete/", ModelCarAutocomplete.as_view(),
+                       name="model-car-autocomplete"),
                   path("set_language/<str:lang>/", ActivateLanguageView.as_view(), name="set_language_from_url"),
                   path('i18n/', include('django.conf.urls.i18n')),
                   path("admin/report/", DashboardReportView.as_view(), name="dashboard-report"),
