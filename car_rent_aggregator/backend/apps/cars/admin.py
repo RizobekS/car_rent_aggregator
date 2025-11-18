@@ -120,7 +120,7 @@ class CarAdmin(admin.ModelAdmin):
         }),
         (_("Технические данные"), {
             "fields": (
-                "mileage_km", "color",
+                "mileage_km", "color", "new_color",
                 "engine_volume_l", "horsepower_hp",
                 "fuel_type", "fuel_consumption_l_per_100km",
             )
