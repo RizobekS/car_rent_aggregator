@@ -3,7 +3,10 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import PermissionDenied
 from apps.partners.models import PartnerAdminLink
-from .models import Car, CarCalendar, CarImages, Region
+from .models import (
+    Car, CarCalendar, CarImages, Region,
+    MarkCar, ModelCar, ColorCar,
+)
 
 PARTNER_GROUP = "Partners"  # имя группы для партнёрских админов
 
@@ -25,7 +28,42 @@ def partner_ids_for_user(request):
     )
 
 
-# ───────────────────────── Car ─────────────────────────
+# ───────────────────────── простые справочники ─────────────────────────
+
+@admin.register(Region)
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ("id", "name")
+    search_fields = ("name",)
+    ordering = ("name",)
+
+
+@admin.register(ColorCar)
+class ColorCarAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "created_at")
+    search_fields = ("name",)
+    ordering = ("name",)
+    readonly_fields = ("created_at", "updated_at")
+
+
+@admin.register(MarkCar)
+class MarkCarAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "created_at")
+    search_fields = ("name",)
+    ordering = ("name",)
+    readonly_fields = ("created_at", "updated_at")
+
+
+@admin.register(ModelCar)
+class ModelCarAdmin(admin.ModelAdmin):
+    list_display = ("id", "mark", "name", "created_at")
+    list_filter = ("mark",)
+    search_fields = ("name", "mark__name")
+    ordering = ("mark__name", "name")
+    autocomplete_fields = ("mark",)
+    readonly_fields = ("created_at", "updated_at")
+
+
+# ───────────────────────── Car + Images ─────────────────────────
 
 class CarImagesInline(admin.StackedInline):
     model = CarImages
@@ -37,22 +75,34 @@ class CarImagesInline(admin.StackedInline):
     verbose_name_plural = _("Фотографии")
 
 
-@admin.register(Region)
-class RegionAdmin(admin.ModelAdmin):
-    list_display = ("id", "name")
-    search_fields = ("name",)
-
-
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
     list_display = (
         "id", "title", "partner", "plate_number", "region",
-        "car_class", "gearbox",
-        "drive_type", "fuel_type", "mileage_km",
-        "price_weekday", "price_weekend", "active"
+        "make", "model", "color",
+        "car_class", "gearbox", "drive_type",
+        "price_weekday", "price_weekend",
+        "active",
     )
-    list_filter  = ("active", "car_class", "gearbox", "drive_type", "fuel_type", "region", "partner")
-    search_fields = ("id", "title", "partner__name", "make", "model", "color", "plate_number")
+    list_filter  = (
+        "active", "car_class", "gearbox", "drive_type",
+        "fuel_type", "region", "partner", "mark", "new_model", "new_color",
+    )
+    search_fields = (
+        "id", "title",
+        "partner__name",
+        "mark__name", "new_model__name",
+        "new_color__name",
+        "plate_number",
+    )
+    list_select_related = (
+        "partner", "region", "mark", "new_model", "new_color",
+    )
+    ordering = ("partner", "mark__name", "new_model__name")
+
+    # FK-ы через автодополнение
+    autocomplete_fields = ("partner", "region", "mark", "new_model", "new_color")
+
     inlines = [CarImagesInline]
 
     fieldsets = (
@@ -61,7 +111,9 @@ class CarAdmin(admin.ModelAdmin):
                 "partner",
                 "region",
                 "plate_number",
-                "title", "make", "model", "year",
+                "title",
+                "mark", "new_model",
+                "year",
                 "car_class", "gearbox", "drive_type",
                 "active",
             )
@@ -86,12 +138,13 @@ class CarAdmin(admin.ModelAdmin):
 
     # ограничение видимости по партнёру
     def get_queryset(self, request):
-        qs = super().get_queryset(request).select_related("partner", "region")
+        qs = super().get_queryset(request)
         if is_partner_admin(request):
             ids = partner_ids_for_user(request)
             return qs.filter(partner_id__in=ids) if ids else qs.none()
         return qs
 
+    # ограничение выбора партнёра в форме
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "partner" and is_partner_admin(request):
             ids = partner_ids_for_user(request)
@@ -106,6 +159,7 @@ class CarAdmin(admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
+        # автоподстановка единственного партнёра при создании
         if is_partner_admin(request) and not obj:
             ids = partner_ids_for_user(request)
             if len(ids) == 1 and "partner" in form.base_fields:
@@ -131,6 +185,8 @@ class CarAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
+# ───────────────────────── Календарь авто ─────────────────────────
+
 @admin.register(CarCalendar)
 class CarCalendarAdmin(admin.ModelAdmin):
     """
@@ -142,13 +198,14 @@ class CarCalendarAdmin(admin.ModelAdmin):
     list_display = ("id", "car", "car_partner", "date_from", "date_to", "status")
     list_filter = ("status", "car__partner")
     search_fields = ("car__title", "car__partner__name")
+    list_select_related = ("car", "car__partner")
 
     def car_partner(self, obj):
         return getattr(obj.car.partner, "name", "-")
     car_partner.short_description = _("Партнёр")
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request).select_related("car", "car__partner")
+        qs = super().get_queryset(request)
         if is_partner_admin(request):
             ids = partner_ids_for_user(request)
             return qs.filter(car__partner_id__in=ids) if ids else qs.none()
@@ -183,3 +240,12 @@ class CarCalendarAdmin(admin.ModelAdmin):
         if is_partner_admin(request) and obj is not None:
             return obj.car.partner_id in set(partner_ids_for_user(request))
         return True
+
+
+# ───────────────────────── Фото ─────────────────────────
+
+@admin.register(CarImages)
+class CarImagesAdmin(admin.ModelAdmin):
+    list_display = ("id", "car", "created_at")
+    search_fields = ("car__title", "car__partner__name")
+    list_select_related = ("car",)

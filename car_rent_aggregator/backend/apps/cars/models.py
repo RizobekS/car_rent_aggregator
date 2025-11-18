@@ -20,6 +20,50 @@ class Region(models.Model):
     def __str__(self):
         return self.name
 
+class ColorCar(models.Model):
+    class Meta:
+        verbose_name = _("Цвет автомобиля")
+        verbose_name_plural = _("Цвета автомобилей")
+
+    name = models.CharField(_("Название цвета автомобиля"), max_length=150, null=True, unique=True)
+
+    created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("Обновлено"), auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
+class MarkCar(models.Model):
+    class Meta:
+        verbose_name = _("Марка автомобиля")
+        verbose_name_plural = _("Марки автомобилей")
+
+    name = models.CharField(_("Название марки автомобиля"), max_length=150, null=True)
+
+    created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("Обновлено"), auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ModelCar(models.Model):
+    class Meta:
+        verbose_name = _("Модель автомобиля")
+        verbose_name_plural = _("Модели автомобилей")
+        unique_together = ("mark", "name")
+
+    mark = models.ForeignKey(MarkCar, verbose_name=_("Марка автомобиля"), on_delete=models.CASCADE)
+    name = models.CharField(_("Название модели автомобиля"), max_length=150, null=True)
+
+    created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("Обновлено"), auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
 
 class Car(models.Model):
     """Карточка автомобиля в автопарке партнёра."""
@@ -56,7 +100,9 @@ class Car(models.Model):
         help_text=_("Напр.: Chevrolet Cobalt 2022")
     )
     make  = models.CharField(_("Марка автомобиля"), max_length=100)
+    mark = models.ForeignKey(MarkCar, verbose_name=_("Марка автомобиля"), null=True, on_delete=models.CASCADE)
     model = models.CharField(_("Модель автомобиля"), max_length=100)
+    new_model = models.ForeignKey(ModelCar, verbose_name=_("Модель автомобиля>"), null=True, on_delete=models.CASCADE)
     year  = models.PositiveSmallIntegerField(_("Год выпуска"))
 
     car_class = models.CharField(_("Класс авто"), max_length=20, choices=CarClass.choices, db_index=True)
@@ -90,6 +136,7 @@ class Car(models.Model):
         null=True, blank=True
     )
     color      = models.CharField(_("Цвет"), max_length=50, blank=True)
+    new_color      = models.OneToOneField(ColorCar, null=True, verbose_name=_("Цвет"), unique=True, on_delete=models.SET_NULL)
     insurance_included = models.BooleanField(_("Страховка включена"), default=False)
     child_seat = models.BooleanField(_("Детское кресло"), default=False)
 
