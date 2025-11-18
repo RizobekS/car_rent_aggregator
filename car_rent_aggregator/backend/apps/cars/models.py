@@ -31,7 +31,7 @@ class ColorCar(models.Model):
     updated_at = models.DateTimeField(_("Обновлено"), auto_now=True)
 
     def __str__(self):
-        return self.name
+        return self.name or f"Color #{self.pk}"
 
 
 class MarkCar(models.Model):
@@ -45,7 +45,7 @@ class MarkCar(models.Model):
     updated_at = models.DateTimeField(_("Обновлено"), auto_now=True)
 
     def __str__(self):
-        return self.name
+        return self.name or f"Mark #{self.pk}"
 
 
 class ModelCar(models.Model):
@@ -60,8 +60,11 @@ class ModelCar(models.Model):
     created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Обновлено"), auto_now=True)
 
-    def __str__(self):
-        return self.name
+    def __str__(self) -> str:
+        base = self.name or f"Model #{self.pk}"
+        if self.mark_id:
+            return f"{self.mark} {base}"
+        return base
 
 
 
@@ -136,7 +139,14 @@ class Car(models.Model):
         null=True, blank=True
     )
     color      = models.CharField(_("Цвет"), max_length=50, blank=True)
-    new_color      = models.OneToOneField(ColorCar, null=True, verbose_name=_("Цвет"), unique=True, on_delete=models.SET_NULL)
+    new_color = models.ForeignKey(
+        ColorCar,
+        verbose_name=_("Цвет"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="cars",
+    )
     insurance_included = models.BooleanField(_("Страховка включена"), default=False)
     child_seat = models.BooleanField(_("Детское кресло"), default=False)
 
