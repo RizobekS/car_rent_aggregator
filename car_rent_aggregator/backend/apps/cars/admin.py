@@ -79,7 +79,7 @@ class CarImagesInline(admin.StackedInline):
 class CarAdmin(admin.ModelAdmin):
     list_display = (
         "id", "title", "partner", "plate_number", "region",
-        "make", "model", "color",
+        "mark", "new_model", "new_color",
         "car_class", "gearbox", "drive_type",
         "price_weekday", "price_weekend",
         "active",
@@ -120,7 +120,7 @@ class CarAdmin(admin.ModelAdmin):
         }),
         (_("Технические данные"), {
             "fields": (
-                "mileage_km", "color", "new_color",
+                "mileage_km", "new_color",
                 "engine_volume_l", "horsepower_hp",
                 "fuel_type", "fuel_consumption_l_per_100km",
             )

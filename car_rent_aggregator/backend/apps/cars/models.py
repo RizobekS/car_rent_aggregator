@@ -102,10 +102,8 @@ class Car(models.Model):
         max_length=200,
         help_text=_("Напр.: Chevrolet Cobalt 2022")
     )
-    make  = models.CharField(_("Марка автомобиля"), max_length=100)
     mark = models.ForeignKey(MarkCar, verbose_name=_("Марка автомобиля"), null=True, on_delete=models.CASCADE)
-    model = models.CharField(_("Модель автомобиля"), max_length=100)
-    new_model = models.ForeignKey(ModelCar, verbose_name=_("Модель автомобиля>"), null=True, on_delete=models.CASCADE)
+    new_model = models.ForeignKey(ModelCar, verbose_name=_("Модель автомобиля"), null=True, on_delete=models.CASCADE)
     year  = models.PositiveSmallIntegerField(_("Год выпуска"))
 
     car_class = models.CharField(_("Класс авто"), max_length=20, choices=CarClass.choices, db_index=True)
@@ -138,7 +136,6 @@ class Car(models.Model):
         choices=DriveType.choices,
         null=True, blank=True
     )
-    color      = models.CharField(_("Цвет"), max_length=50, blank=True)
     new_color = models.ForeignKey(
         ColorCar,
         verbose_name=_("Цвет"),
@@ -184,7 +181,7 @@ class Car(models.Model):
     class Meta:
         verbose_name = _("Автомобиль")
         verbose_name_plural = _("Автомобили")
-        ordering = ("partner", "make", "model", "year")
+        ordering = ("partner", "mark", "new_model", "year")
         indexes = [
             models.Index(fields=["partner", "active"]),
             models.Index(fields=["car_class", "gearbox"]),
