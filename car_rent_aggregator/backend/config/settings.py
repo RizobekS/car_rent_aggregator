@@ -241,9 +241,13 @@ JAZZMIN_SETTINGS = {
         "bookings.Booking": "fas fa-calendar-check",
         "bookings.BookingExtension": "fas fa-history",
 
-        "cars": "fas fa-car",
         "cars.Car": "fas fa-car-side",
+        "cars.MarkCar": "fas fa-warehouse",
+        "cars.ModelCar": "fas fa-car",
+        "cars.ColorCar": "fas fa-palette",
         "cars.CarCalendar": "fas fa-calendar-day",
+        "cars.CarImages": "fas fa-image",
+        "cars.Region": "fas fa-map",
 
         "partners": "fas fa-handshake",
         "partners.Partner": "fas fa-building",
@@ -253,8 +257,8 @@ JAZZMIN_SETTINGS = {
         "users": "fas fa-user-circle",
         "users.BotUser": "fas fa-id-card",
 
-        "payments": "fas fa-credit-card",
-        "audit": "fas fa-clipboard-check",
+        "payments.Payment": "fas fa-credit-card",
+        "audit.AuditEvent": "fas fa-clipboard-check",
         "common": "fas fa-cog",
 
         "dashboard": "fas fa-chart-line",
