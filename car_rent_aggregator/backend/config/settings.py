@@ -29,6 +29,8 @@ CORS_ALLOW_ALL_ORIGINS = os.environ.get("CORS_ALLOW_ORIGINS", "True").lower() in
 
 INSTALLED_APPS = [
     "jazzmin",
+    "dal",
+    "dal_select2",
     "modeltranslation",
     'django.contrib.admin',
     'django.contrib.auth',
@@ -145,7 +147,7 @@ PAYTECHUZ = {
         "PAYME_ID":        os.environ.get("PAYME_ID"),
         "PAYME_KEY":       os.environ.get("PAYME_KEY_TEST"),
 
-        "ACCOUNT_MODEL":   "apps.bookings.models.Booking",
+        "ACCOUNT_MODEL":   "apps.payments.models.Payment",
         "ACCOUNT_FIELD":   "id",
         "AMOUNT_FIELD":    "price_quote",
         "ONE_TIME_PAYMENT": True,
@@ -158,7 +160,8 @@ PAYTECHUZ = {
         "SECRET_KEY":       os.environ.get("CLICK_SECRET_KEY"),
         "BASE_URL":         os.getenv("CLICK_BASE_URL", "https://my.click.uz"),
 
-        "ACCOUNT_MODEL":    "apps.bookings.models.Booking",
+        "ACCOUNT_MODEL":    "apps.payments.models.Payment",
+        "ACCOUNT_FIELD":    "id",
         "COMMISSION_PERCENT": float(os.environ.get("CLICK_COMMISSION", "0")),
         "IS_TEST_MODE":     False,
     },
