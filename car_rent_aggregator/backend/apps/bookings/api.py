@@ -17,6 +17,8 @@ from apps.cars.models import Car, CarCalendar
 from apps.partners.models import PartnerUser
 from apps.users.models import BotUser
 
+from apps.common.choices import BookingStatus, PaymentMarker
+
 HOLD_MINUTES = 20  # TTL ожидания подтверждения
 
 
@@ -162,13 +164,45 @@ class BookingViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     def get_serializer_class(self):
         return BookingCreateSerializer if self.action == "create" else BookingSerializer
 
+    def _cleanup_expired_confirmed_unpaid(self):
+        """
+        Лениво отменяем подтверждённые, но не оплаченные брони,
+        старше HOLD_MINUTES, и освобождаем CarCalendar.
+        """
+        now = timezone.now()
+        cutoff = now - timezone.timedelta(minutes=HOLD_MINUTES)
+
+        stale = (
+            Booking.objects
+            .filter(
+                status=BookingStatus.CONFIRMED,
+                updated_at__lt=cutoff,
+            )
+            .exclude(payment_marker=PaymentMarker.PAID)
+        )
+
+        if not stale.exists():
+            return
+
+        for b in stale.select_related("car"):
+            CarCalendar.objects.filter(
+                car=b.car,
+                date_from=b.date_from,
+                date_to=b.date_to,
+            ).delete()
+
+        stale.update(status=BookingStatus.CANCELED, updated_at=now)
+
     def get_queryset(self):
+        # сначала прибираемся
+        self._cleanup_expired_confirmed_unpaid()
+
         qs = super().get_queryset()
         p_tg = self.request.query_params.get("partner_tg_user_id")
         p_username = self.request.query_params.get("partner_username")
         c_tg = self.request.query_params.get("client_tg_user_id")
         status_q = self.request.query_params.get("status")
-        fresh_minutes = int(self.request.query_params.get("fresh_minutes", 0))
+        fresh_minutes = int(self.request.query_params.get("fresh_minutes", 0) or 0)
 
         if p_tg:
             qs = qs.filter(partner__users__tg_user_id=p_tg, partner__users__is_active=True)
@@ -178,7 +212,7 @@ class BookingViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             qs = qs.filter(client__tg_user_id=c_tg)
         if status_q:
             qs = qs.filter(status=status_q)
-        if fresh_minutes > 0 and status_q == "pending":
+        if fresh_minutes > 0 and status_q == BookingStatus.PENDING:
             qs = fresh_pending(qs, minutes=fresh_minutes)
 
         return qs.order_by("-created_at")

@@ -1,5 +1,6 @@
 # apps/bookings/models.py
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from apps.cars.models import Car
 from apps.partners.models import Partner
@@ -63,6 +64,40 @@ class Booking(models.Model):
             models.Index(fields=["client", "status"]),
             models.Index(fields=["car", "date_from", "date_to"]),
         ]
+
+    def mark_paid_by_payment(self, payment=None, *, save: bool = True):
+        """
+        Пометить бронь как оплаченную.
+        Используем payment_marker, статус брони НЕ трогаем, чтобы не ломать текущий флоу.
+        """
+        self.payment_marker = PaymentMarker.PAID
+        self.updated_at = timezone.now()
+        if save:
+            self.save(update_fields=["payment_marker", "updated_at"])
+
+    def mark_payment_failed(self, payment=None, *, save: bool = True, cancel_booking: bool = True):
+        """
+        Обработка неуспешной/отменённой оплаты.
+        По ТЗ: бронь отменяем и освобождаем машину.
+        """
+        from apps.cars.models import CarCalendar
+
+        self.payment_marker = PaymentMarker.UNPAID
+        if cancel_booking and self.status in (
+                BookingStatus.PENDING,
+                BookingStatus.CONFIRMED,
+        ):
+            self.status = BookingStatus.CANCELED
+        self.updated_at = timezone.now()
+        if save:
+            self.save(update_fields=["payment_marker", "status", "updated_at"])
+
+        # чистим занятость по этой броне
+        CarCalendar.objects.filter(
+            car=self.car,
+            date_from=self.date_from,
+            date_to=self.date_to,
+        ).delete()
 
     def clean(self):
         from django.core.exceptions import ValidationError
