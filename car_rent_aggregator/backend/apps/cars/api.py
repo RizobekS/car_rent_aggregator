@@ -57,7 +57,7 @@ class CarSerializer(serializers.ModelSerializer):
         model = Car
         fields = (
             "id", "partner", "partner_name",
-            "title", "make", "model", "year",
+            "title", "mark", "model", "year",
             "car_class", "gearbox",
             # новые поля
             "mileage_km", "engine_volume_l", "horsepower_hp",
@@ -153,4 +153,4 @@ class CarsSearchView(generics.ListAPIView):
                       "busy=", len(busy_car_ids), "booked=", len(booked_car_ids),
                       "final_count=", qs.exclude(id__in=(busy_car_ids | booked_car_ids)).count())
 
-        return qs.select_related("partner", "images").order_by("partner_id", "make", "model", "-year")
+        return qs.select_related("partner", "images").order_by("partner_id", "mark_id", "model_id", "-year")
