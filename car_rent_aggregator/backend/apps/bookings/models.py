@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.cars.models import Car
 from apps.partners.models import Partner
 from apps.users.models import BotUser
-from apps.common.choices import BookingStatus, PaymentMarker
+from apps.common.choices import BookingStatus, PaymentMarker, PaymentStatus
 
 
 class Booking(models.Model):
@@ -14,19 +14,19 @@ class Booking(models.Model):
         Car,
         verbose_name=_("Автомобиль"),
         on_delete=models.PROTECT,
-        related_name="bookings"
+        related_name="bookings",
     )
     partner = models.ForeignKey(
         Partner,
         verbose_name=_("Партнёр"),
         on_delete=models.PROTECT,
-        related_name="bookings"
+        related_name="bookings",
     )
     client = models.ForeignKey(
         BotUser,
         verbose_name=_("Клиент"),
         on_delete=models.PROTECT,
-        related_name="bookings"
+        related_name="bookings",
     )
     client_phone = models.CharField(_("Телефон клиента"), max_length=32)
 
@@ -36,7 +36,7 @@ class Booking(models.Model):
     price_quote = models.DecimalField(
         _("Расчётная стоимость, UZS"),
         max_digits=12,
-        decimal_places=2
+        decimal_places=2,
     )
 
     status = models.CharField(
@@ -44,13 +44,21 @@ class Booking(models.Model):
         max_length=12,
         choices=BookingStatus.choices,
         default=BookingStatus.PENDING,
-        db_index=True
+        db_index=True,
     )
     payment_marker = models.CharField(
         _("Оплата брони"),
         max_length=8,
         choices=PaymentMarker.choices,
-        default=PaymentMarker.UNPAID
+        default=PaymentMarker.UNPAID,
+    )
+
+    # Доп. поле состояния оплаты, синхронизированное с Payment.status
+    payment_status = models.CharField(
+        _("Статус оплаты по брони"),
+        max_length=32,
+        choices=PaymentStatus.choices,
+        default=PaymentStatus.NEW,
     )
 
     created_at = models.DateTimeField(_("Создано"), auto_now_add=True)
@@ -65,32 +73,48 @@ class Booking(models.Model):
             models.Index(fields=["car", "date_from", "date_to"]),
         ]
 
+    # ---------- Хелперы для оплаты ----------
+
     def mark_paid_by_payment(self, payment=None, *, save: bool = True):
         """
         Пометить бронь как оплаченную.
-        Используем payment_marker, статус брони НЕ трогаем, чтобы не ломать текущий флоу.
+
+        Используем:
+          • payment_marker = PAID (для фронта/бота)
+          • payment_status = PaymentStatus.PAID (для отчётов/аналитики)
+
+        Статус самой брони (confirmed/completed/...) НЕ трогаем,
+        этим управляет бизнес-логика партнёров и процесс выдачи авто.
         """
         self.payment_marker = PaymentMarker.PAID
+        self.payment_status = PaymentStatus.PAID
         self.updated_at = timezone.now()
         if save:
-            self.save(update_fields=["payment_marker", "updated_at"])
+            self.save(update_fields=["payment_marker", "payment_status", "updated_at"])
 
     def mark_payment_failed(self, payment=None, *, save: bool = True, cancel_booking: bool = True):
         """
         Обработка неуспешной/отменённой оплаты.
-        По ТЗ: бронь отменяем и освобождаем машину.
+
+        По ТЗ:
+          • сама оплата считается неуспешной,
+          • бронь можно отменить,
+          • слот по машине освобождаем.
         """
         from apps.cars.models import CarCalendar
 
         self.payment_marker = PaymentMarker.UNPAID
+        self.payment_status = PaymentStatus.FAILED
+
         if cancel_booking and self.status in (
-                BookingStatus.PENDING,
-                BookingStatus.CONFIRMED,
+            BookingStatus.PENDING,
+            BookingStatus.CONFIRMED,
         ):
             self.status = BookingStatus.CANCELED
+
         self.updated_at = timezone.now()
         if save:
-            self.save(update_fields=["payment_marker", "status", "updated_at"])
+            self.save(update_fields=["payment_marker", "payment_status", "status", "updated_at"])
 
         # чистим занятость по этой броне
         CarCalendar.objects.filter(
@@ -99,6 +123,8 @@ class Booking(models.Model):
             date_to=self.date_to,
         ).delete()
 
+    # ---------- Валидация / строковое представление ----------
+
     def clean(self):
         from django.core.exceptions import ValidationError
         if self.date_to <= self.date_from:
@@ -106,7 +132,6 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"#{self.pk} {self.car} {self.date_from:%Y-%m-%d}→{self.date_to:%Y-%m-%d} ({self.get_status_display()})"
-
 
 class BookingExtension(models.Model):
     """Продление активной брони на N дней после согласования/оплаты."""
