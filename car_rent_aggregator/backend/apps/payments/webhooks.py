@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 import logging
-from django.http import JsonResponse, HttpRequest
+from django.http import HttpRequest
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
@@ -38,17 +38,22 @@ class PaymeWebhookView(PTUBasePaymeView):
 
     def successfully_payment(self, params, transaction):
         try:
-            payment_id = transaction.account_id  # мы кладём id Payment в account_id
+            # В Payme в account_id кладём id нашей Payment
+            payment_id = transaction.account_id
             pay: Payment = Payment.objects.select_related("booking").get(pk=payment_id)
 
             pay.status = PaymentStatus.PAID
-            pay.provider_ref = str(transaction.transaction_id)
-            raw = pay.raw_provider_response or {}
-            raw["payme_success"] = {"params": params}
-            pay.raw_provider_response = raw
-            pay.save(update_fields=["status", "provider_ref", "raw_provider_response"])
+            raw = pay.raw_meta or {}
+            raw["payme_success"] = {
+                "params": params,
+                "transaction_id": str(transaction.transaction_id),
+            }
+            pay.raw_meta = raw
+            # Важно: сохраняем только реально существующие поля
+            pay.save(update_fields=["status", "raw_meta"])
 
             if pay.booking_id:
+                # метод в Booking, который выставляет оплаченный статус и чистит hold/календарь
                 pay.booking.mark_paid_by_payment(pay)
         except Payment.DoesNotExist:
             logger.error("Payme: Payment %s not found on success", transaction.account_id)
@@ -61,10 +66,13 @@ class PaymeWebhookView(PTUBasePaymeView):
             pay: Payment = Payment.objects.select_related("booking").get(pk=payment_id)
 
             pay.status = PaymentStatus.FAILED
-            raw = pay.raw_provider_response or {}
-            raw["payme_canceled"] = {"params": params}
-            pay.raw_provider_response = raw
-            pay.save(update_fields=["status", "raw_provider_response"])
+            raw = pay.raw_meta or {}
+            raw["payme_canceled"] = {
+                "params": params,
+                "transaction_id": str(transaction.transaction_id),
+            }
+            pay.raw_meta = raw
+            pay.save(update_fields=["status", "raw_meta"])
 
             if pay.booking_id:
                 pay.booking.mark_payment_failed(pay)
@@ -97,19 +105,19 @@ class ClickWebhookView(PTUBaseClickView):
 
     def transaction_created(self, params, transaction, account):
         """
-        Prepare прошёл: сохраним «чёрновик» в raw_provider_response.
+        Prepare прошёл: сохраним «черновик» в raw_meta.
         """
         try:
             pay = self._get_payment(params.get("merchant_trans_id"))
             if not pay:
                 return
-            raw = pay.raw_provider_response or {}
+            raw = pay.raw_meta or {}
             raw["click_prepare"] = {
                 "params": params,
                 "transaction_id": transaction.transaction_id,
             }
-            pay.raw_provider_response = raw
-            pay.save(update_fields=["raw_provider_response"])
+            pay.raw_meta = raw
+            pay.save(update_fields=["raw_meta"])
         except Exception as e:
             logger.exception("Click transaction_created handler failed: %s", e)
 
@@ -124,11 +132,14 @@ class ClickWebhookView(PTUBaseClickView):
                 return
 
             pay.status = PaymentStatus.PAID
-            pay.provider_ref = str(transaction.transaction_id)
-            raw = pay.raw_provider_response or {}
-            raw["click_complete"] = {"result": "success", "params": params}
-            pay.raw_provider_response = raw
-            pay.save(update_fields=["status", "provider_ref", "raw_provider_response"])
+            raw = pay.raw_meta or {}
+            raw["click_complete"] = {
+                "result": "success",
+                "params": params,
+                "transaction_id": transaction.transaction_id,
+            }
+            pay.raw_meta = raw
+            pay.save(update_fields=["status", "raw_meta"])
 
             if pay.booking_id:
                 pay.booking.mark_paid_by_payment(pay)
@@ -146,10 +157,14 @@ class ClickWebhookView(PTUBaseClickView):
                 return
 
             pay.status = PaymentStatus.FAILED
-            raw = pay.raw_provider_response or {}
-            raw["click_complete"] = {"result": "canceled", "params": params}
-            pay.raw_provider_response = raw
-            pay.save(update_fields=["status", "raw_provider_response"])
+            raw = pay.raw_meta or {}
+            raw["click_complete"] = {
+                "result": "canceled",
+                "params": params,
+                "transaction_id": transaction.transaction_id,
+            }
+            pay.raw_meta = raw
+            pay.save(update_fields=["status", "raw_meta"])
 
             if pay.booking_id:
                 pay.booking.mark_payment_failed(pay)
