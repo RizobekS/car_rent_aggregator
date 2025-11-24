@@ -199,6 +199,18 @@ class CarAdmin(admin.ModelAdmin):
             return qs.filter(partner_id__in=ids) if ids else qs.none()
         return qs
 
+    def get_list_filter(self, request):
+        """
+        Партнёрам не показываем фильтр по partner,
+        остальные фильтры оставляем.
+        """
+        if is_partner_admin(request):
+            return (
+                "active", "car_class", "gearbox", "drive_type",
+                "fuel_type", "region", "mark", "model", "color",
+            )
+        return super().get_list_filter(request)
+
     # ограничение выбора партнёра в форме
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "partner" and is_partner_admin(request):
@@ -262,6 +274,14 @@ class CarCalendarAdmin(admin.ModelAdmin):
         return getattr(obj.car.partner, "name", "-")
     car_partner.short_description = _("Партнёр")
 
+    def get_list_filter(self, request):
+        """
+        Для партнёров не показываем фильтр по car__partner.
+        """
+        if is_partner_admin(request):
+            return ("status",)
+        return super().get_list_filter(request)
+
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if is_partner_admin(request):
@@ -298,12 +318,3 @@ class CarCalendarAdmin(admin.ModelAdmin):
         if is_partner_admin(request) and obj is not None:
             return obj.car.partner_id in set(partner_ids_for_user(request))
         return True
-
-
-# ───────────────────────── Фото ─────────────────────────
-
-@admin.register(CarImages)
-class CarImagesAdmin(admin.ModelAdmin):
-    list_display = ("id", "car", "created_at")
-    search_fields = ("car__title", "car__partner__name")
-    list_select_related = ("car",)

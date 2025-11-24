@@ -111,6 +111,17 @@ class BookingAdmin(admin.ModelAdmin):
     def _can_reveal_client(self, obj: Booking) -> bool:
         return bool(obj and obj.status in REVEAL_STATUSES)
 
+    def get_list_filter(self, request):
+        """
+        Для партнёров не показываем фильтр по partner,
+        чтобы не светить список всех партнёров.
+        Для админов всё как было.
+        """
+        if is_partner_admin(request):
+            # только статус
+            return ("status",)
+        return super().get_list_filter(request)
+
     def _partner_ids_for_user(self, request):
         """Вернём список partner_id, связанных с этим Django-пользователем через PartnerAdminLink."""
         from apps.partners.models import PartnerAdminLink
