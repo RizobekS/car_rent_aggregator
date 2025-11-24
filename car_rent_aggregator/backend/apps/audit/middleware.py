@@ -1,10 +1,8 @@
-# apps/audit/middleware.py
 from __future__ import annotations
 import time
 from typing import Callable
+
 from django.http import HttpRequest, HttpResponse
-from django.utils.deprecation import MiddlewareMixin  # только для type hints
-from django.utils.module_loading import import_string
 from django.conf import settings
 
 from .models import AuditEvent
@@ -28,9 +26,9 @@ class RequestAuditMiddleware:
     Лёгкий request-аудит:
       - Пишем только write-методы (POST/PUT/PATCH/DELETE).
       - Логируем /admin/* и /api/* (включая вебхуки).
-      - Заводим actor_kind:
+      - actor_kind:
            user    — обычный staff/superuser из админки
-           bot     — запрос с валидным X-Api-Key (ваши Telegram-боты)
+           bot     — запрос с валидным X-Api-Key (боты)
            webhook — Payme/Click вебхуки (пути из WEBHOOK_WHITELIST_PATHS)
     """
 
@@ -39,13 +37,14 @@ class RequestAuditMiddleware:
         self.api_key = getattr(settings, "BOTS_API_KEY", "")
 
     def __call__(self, request: HttpRequest) -> HttpResponse:
-        # пишем только для изменяющих запросов
+        # Пишем только изменяющие запросы
         if request.method not in WRITE_METHODS:
             return self.get_response(request)
 
         started = time.perf_counter()
-        response = None
+        response: HttpResponse | None = None
         ex: Exception | None = None
+
         try:
             response = self.get_response(request)
             return response
@@ -53,66 +52,85 @@ class RequestAuditMiddleware:
             ex = e
             raise
         finally:
-            try:
-                # фильтр по зонам
-                path = request.path or "/"
-                if not (path.startswith("/admin/") or path.startswith(API_PREFIX)):
-                    return
+            # ВАЖНО: тут НЕТ return, чтобы не перебивать ответ!
+            self._log_request(request, response, started, ex)
 
-                actor_kind = "user"
-                actor_label = ""
-                user = getattr(request, "user", None)
+    def _log_request(
+        self,
+        request: HttpRequest,
+        response: HttpResponse | None,
+        started: float,
+        ex: Exception | None,
+    ) -> None:
+        """
+        Вспомогательная функция, которая пишет AuditEvent.
+        Любые return/исключения здесь НЕ влияют на __call__.
+        """
+        try:
+            path = request.path or "/"
 
-                # вебхуки?
-                if _path_is_webhook(path):
-                    actor_kind = "webhook"
-                    actor_label = "webhook"
+            # Логируем только admin и API; остальное (включая /i18n/setlang/) пропускаем
+            if not (path.startswith("/admin/") or path.startswith(API_PREFIX)):
+                return
 
-                # api-бот?
-                elif path.startswith(API_PREFIX):
-                    key = request.headers.get("X-Api-Key") or request.META.get("HTTP_X_API_KEY")
-                    if key and key == self.api_key:
-                        actor_kind = "bot"
-                        actor_label = "X-Api-Key"
+            actor_kind = "user"
+            actor_label = ""
+            user = getattr(request, "user", None)
 
-                # статус и задержка
-                if response is not None:
-                    status = response.status_code
-                else:
-                    status = 500
-                latency_ms = int((time.perf_counter() - started) * 1000)
+            # вебхуки?
+            if _path_is_webhook(path):
+                actor_kind = "webhook"
+                actor_label = "webhook"
 
-                # кто
-                is_staff = bool(getattr(user, "is_staff", False))
-                is_superuser = bool(getattr(user, "is_superuser", False))
-                ip = (request.META.get("HTTP_X_REAL_IP")
-                      or request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")[0].strip()
-                      or request.META.get("REMOTE_ADDR"))
+            # api-бот?
+            elif path.startswith(API_PREFIX):
+                key = request.headers.get("X-Api-Key") or request.META.get("HTTP_X_API_KEY")
+                if key and key == self.api_key:
+                    actor_kind = "bot"
+                    actor_label = "X-Api-Key"
 
-                AuditEvent.objects.create(
-                    user=user if getattr(user, "is_authenticated", False) else None,
-                    is_staff=is_staff,
-                    is_superuser=is_superuser,
-                    actor_kind=actor_kind,
-                    actor_label=actor_label,
-                    ip=ip,
-                    ua=request.META.get("HTTP_USER_AGENT", ""),
-                    path=path,
-                    method=request.method,
-                    status_code=status,
-                    latency_ms=latency_ms,
-                    view_name=getattr(request, "resolver_match", None).view_name if getattr(request, "resolver_match", None) else "",
-                    action=_infer_action(request, status, actor_kind, ex),
-                    # object_* и changes — на уровне сигналов/бизнес-логики
-                    object_model="",
-                    object_id="",
-                    object_repr="",
-                    changes=None,
-                    extra={"GET": request.GET.dict() if request.GET else None},
-                )
-            except Exception:
-                # аудит не должен ломать основной поток
-                pass
+            # статус и задержка
+            if response is not None:
+                status = response.status_code
+            else:
+                status = 500
+            latency_ms = int((time.perf_counter() - started) * 1000)
+
+            # кто
+            is_staff = bool(getattr(user, "is_staff", False))
+            is_superuser = bool(getattr(user, "is_superuser", False))
+            ip = (
+                request.META.get("HTTP_X_REAL_IP")
+                or request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")[0].strip()
+                or request.META.get("REMOTE_ADDR")
+            )
+
+            resolver_match = getattr(request, "resolver_match", None)
+            view_name = resolver_match.view_name if resolver_match else ""
+
+            AuditEvent.objects.create(
+                user=user if getattr(user, "is_authenticated", False) else None,
+                is_staff=is_staff,
+                is_superuser=is_superuser,
+                actor_kind=actor_kind,
+                actor_label=actor_label,
+                ip=ip,
+                ua=request.META.get("HTTP_USER_AGENT", ""),
+                path=path,
+                method=request.method,
+                status_code=status,
+                latency_ms=latency_ms,
+                view_name=view_name,
+                action=_infer_action(request, status, actor_kind, ex),
+                object_model="",
+                object_id="",
+                object_repr="",
+                changes=None,
+                extra={"GET": request.GET.dict() if request.GET else None},
+            )
+        except Exception:
+            # аудит не должен ломать основной поток
+            return
 
 
 def _infer_action(request: HttpRequest, status: int, actor_kind: str, ex: Exception | None) -> str:
