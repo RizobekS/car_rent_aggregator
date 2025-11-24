@@ -63,10 +63,11 @@ class CarSerializer(serializers.ModelSerializer):
             "mileage_km", "engine_volume_l", "horsepower_hp",
             "fuel_type", "fuel_consumption_l_per_100km",
             "drive_type", "color", "insurance_included", "child_seat",
-            "car_with_driver",   # <── добавлено
+            "car_with_driver",
             # цены/условия
             "price_weekday", "price_weekend",
-            "deposit_band", "deposit_amount", "limit_km", "delivery",
+            "deposit", "deposit_amount", "limit_km", "delivery",
+            "age_access", "drive_exp", "passport",
             # медиа
             "active", "images", "images_rel", "cover_url", "cover_rel",
         )

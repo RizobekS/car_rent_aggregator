@@ -120,11 +120,15 @@ card-line2 =
        *[no]
     }
 card-price = 🗓 Ish kunlari: { $wd } so‘m/sutka\n📅 Dam olish kunlari: { $we } so‘m/sutka
-card-terms = 💳 Garov: { $deposit }\n✒️ Kunlik limit: { $limit } km/sutka\n🛡️ Sug‘urta: { $ins }
+card-terms = 💳 Garov: { $deposit }\n💳 Oldindan to'lov: { $advance }\n✒️ Kunlik limit: { $limit } km/sutka\n🛡️ Sug‘urta: { $ins }
 card-options-title = 🎁 Opsiyalar:
 card-option-child = • 👶 Bolalar o‘rindig‘i (+tarif bo‘yicha)
 card-option-delivery = • 📍 Manzil bo‘yicha yetkazib berish/qabul qilish
+card-option-driver = • 🚘 Avtomobil haydovchisi bilan
 card-fallback = { $caption }
+card-age = Mijoz yoshi: { $age } yoshdan boshlab
+card-drive-exp = Haydash tajribasi: {$years} yildan boshlab
+card-passport-required = Talab qilinadi: pasport yoki shaxsni tasdiqlovchi hujjat
 
 drive-fwd = Oldingi
 drive-rwd = Orqa
@@ -137,6 +141,7 @@ fuel-hybrid = Gibrid
 fuel-electric = Elektr
 
 deposit-none = Garovsiz
+advance-none = Oldindan to'lovsiz
 deposit-low = Past garov
 deposit-high = Yuqori garov
 
@@ -150,6 +155,7 @@ btn-book = ✅ Bron qilish
 
 terms-title = 📋 «{ $title }» uchun ijaraning shartlari:
 terms-deposit = • 💳 Garov: { $deposit }
+terms-advance = • 💳 Oldindan to'lov: { $advance }
 terms-limit = • ✒️ Kunlik limit: { $limit } km/sutka (ortig‘i — hamkor tarifiga binoan)
 terms-ins = • 🛡️ Sug‘urta: { $ins }
 terms-driver = • 🚘 Haydovchi bilan: { $has ->
@@ -163,6 +169,12 @@ terms-delivery = • 📍 Yetkazib berish: { $has ->
 terms-child = • 👶 Bolalar o‘rindig‘i: { $has ->
     [yes] bor
    *[no]  yo‘q
+}
+terms-age = Mijozning minimal talab qilinadigan yoshi: { $age } yosh
+terms-drive-exp = Minimal talab qilinadigan haydash tajribasi: { $years } yil
+terms-passport = Pasport/shaxsni tasdiqlovchi hujjat: { $has ->
+    [yes] bor
+   *[no]  yo'q
 }
 terms-no-more-photos = Qo‘shimcha foto mavjud emas.
 terms-car-not-found = Avtomobil topilmadi

@@ -109,11 +109,15 @@ back-to-dates = « Back to dates
 card-top = 🚗 { $title }{ $year_part }{ $mileage_part }
 card-line2 = ⚙️ { $class_label }{ $drive_part }
 card-price = 🗓 Weekdays: { $wd } UZS/day\n📅 Weekends: { $we } UZS/day
-card-terms = 💳 Deposit: { $deposit }\n✒️ Mileage limit: { $limit } km/day\n🛡️ Insurance: { $ins }
+card-terms = 💳 Deposit: { $deposit }\n💳 Advance: { $advance }\n✒️ Mileage limit: { $limit } km/day\n🛡️ Insurance: { $ins }
 card-options-title = 🎁 Options:
 card-option-child = • 👶 Child seat (+per tariff)
 card-option-delivery = • 📍 Delivery/pick-up at address
+card-option-driver = • 🚘 Car with driver
 card-fallback = { $caption }
+card-age = Client age: from { $age } years
+card-drive-exp = Driving experience: from { $years } years
+card-passport-required = Required: passport or ID card
 
 drive-fwd = FWD
 drive-rwd = RWD
@@ -126,6 +130,7 @@ fuel-hybrid = Hybrid
 fuel-electric = Electric
 
 deposit-none = No deposit
+advance-none = No advance
 deposit-low = Low deposit
 deposit-high = High deposit
 
@@ -139,6 +144,7 @@ btn-book = ✅ Book
 
 terms-title = 📋 Rental terms for “{ $title }”:
 terms-deposit = • 💳 Deposit: { $deposit }
+terms-advance = • 💳 Advance: { $advance }
 terms-limit = • ✒️ Mileage limit: { $limit } km/day (above this — partner’s tariff applies)
 terms-ins = • 🛡️ Insurance: { $ins }
 terms-driver = • 🚘 Car with driver: { $has ->
@@ -152,6 +158,12 @@ terms-delivery = • 📍 Delivery: { $has ->
 terms-child = • 👶 Child seat: { $has ->
     [yes] available
    *[no]  no
+}
+terms-age = Minimum client age: { $age } years
+terms-drive-exp = Minimum driving experience: { $years } years
+terms-passport = Passport/ID card: { $has ->
+    [yes] Yes
+   *[no]  No
 }
 terms-no-more-photos = No additional photos.
 terms-car-not-found = Car not found

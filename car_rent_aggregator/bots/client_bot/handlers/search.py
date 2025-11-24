@@ -160,13 +160,19 @@ def estimate_quote(start: datetime, end: datetime,
 def build_car_caption(car: dict, lang: str) -> str:
     """
     Красивый текст карточки, с иконками.
-    Мы оставляем прежнюю структуру.
+    Теперь показываем:
+    - класс, привод, двигатель, расход
+    - цены
+    - депозит и аванс
+    - лимит км и страховку
+    - основные условия (возраст, стаж, паспорт)
     """
     title = car.get("title") or t(lang, "card-fallback", caption="")
     year_part = f" ({car['year']})" if car.get("year") else ""
     mileage_part = f" • {fmt_int(car['mileage_km'])} km" if car.get("mileage_km") else ""
     top = t(lang, "card-top", title=title, year_part=year_part, mileage_part=mileage_part)
 
+    # строка с классом и приводом
     cls = car.get("car_class") or ""
     class_label = t(lang, "label-class", value=cls) if cls else ""
     drive_key = {
@@ -177,9 +183,12 @@ def build_car_caption(car: dict, lang: str) -> str:
     drive_label = t(lang, drive_key) if drive_key else ""
     drive_part = f" • {t(lang, 'label-drive', value=drive_label)}" if drive_label else ""
 
-    line2 = t(lang, "card-line2",
-              class_label=class_label,
-              drive_part=drive_part)
+    line2 = t(
+        lang,
+        "card-line2",
+        class_label=class_label,
+        drive_part=drive_part,
+    )
 
     # третья строка: мощность, топливо, расход
     hp = car.get("horsepower_hp")
@@ -202,6 +211,7 @@ def build_car_caption(car: dict, lang: str) -> str:
         parts.append(f"{cons} L/100 km")
     line3 = ("⛽ " + " • ".join(parts)) if parts else ""
 
+    # блок с ценой
     price_block = t(
         lang,
         "card-price",
@@ -209,28 +219,51 @@ def build_car_caption(car: dict, lang: str) -> str:
         we=fmt_int(car.get("price_weekend") or car.get("price_weekday") or 0),
     )
 
-    dep_amt = car.get("advance_amount") or car.get("deposit_amount")
-    # поле в модели ты уже переименовал на сумму аванса — мы пробуем оба варианта
-    dep_text = f"{fmt_int(dep_amt)} UZS" if dep_amt else t(lang, "deposit-none")
+    # депозит и аванс
+    deposit_val = car.get("deposit")
+    advance_val = car.get("deposit_amount")
+
+    deposit_txt = f"{fmt_int(deposit_val)} UZS" if deposit_val else t(lang, "deposit-none")
+    advance_txt = f"{fmt_int(advance_val)} UZS" if advance_val else t(lang, "advance-none")
 
     limit = car.get("limit_km") or 0
     ins = t(lang, "ins-included") if car.get("insurance_included") else t(lang, "ins-excluded")
+
+    # общий блок условий по машине (кратко)
     terms = t(
         lang,
         "card-terms",
-        deposit=dep_text,
+        deposit=deposit_txt,
+        advance=advance_txt,
         limit=fmt_int(limit),
         ins=ins,
     )
 
+    # дополнительные опции
     opts = []
     if car.get("child_seat"):
         opts.append(t(lang, "card-option-child"))
     if car.get("delivery"):
         opts.append(t(lang, "card-option-delivery"))
+    if car.get("car_with_driver"):
+        opts.append(t(lang, "card-option-driver"))
     opts_block = (t(lang, "card-options-title") + "\n" + "\n".join(opts)) if opts else ""
 
+    # базовые требования к клиенту
+    req_parts = []
+    age = car.get("age_access")
+    if age:
+        req_parts.append(t(lang, "card-age", age=age))
+    exp = car.get("drive_exp")
+    if exp:
+        req_parts.append(t(lang, "card-drive-exp", years=exp))
+    if car.get("passport"):
+        req_parts.append(t(lang, "card-passport-required"))
+    req_block = "\n".join(req_parts) if req_parts else ""
+
     blocks = [top, line2, line3, "", price_block, "", terms]
+    if req_block:
+        blocks.extend(["", req_block])
     if opts_block:
         blocks.extend(["", opts_block])
 
@@ -507,19 +540,44 @@ async def show_terms(c: CallbackQuery, state: FSMContext):
     if not car:
         return await c.answer(t(lang, "terms-car-not-found"), show_alert=True)
 
-    dep_amt = car.get("advance_amount") or car.get("deposit_amount")
-    dep_txt = f"{fmt_int(dep_amt)} UZS" if dep_amt else t(lang, "deposit-none")
+    # депозит и аванс
+    deposit_val = car.get("deposit")
+    advance_val = car.get("deposit_amount")
 
-    txt = (
-        t(lang, "terms-title", title=car["title"]) + "\n" +
-        t(lang, "terms-deposit", deposit=dep_txt) + "\n" +
-        t(lang, "terms-limit",   limit=fmt_int(car.get("limit_km") or 0)) + "\n" +
-        t(lang, "terms-ins",     ins=t(lang, "ins-included") if car.get("insurance_included") else t(lang, "ins-excluded")) + "\n" +
-        t(lang, "terms-driver",  has=t(lang, "yes") if car.get("car_with_driver") else t(lang, "no")) + "\n" +
-        t(lang, "terms-delivery",has=t(lang, "yes") if car.get("delivery") else t(lang, "no")) + "\n" +
-        t(lang, "terms-child",   has=t(lang, "yes") if car.get("child_seat") else t(lang, "no"))
+    deposit_txt = f"{fmt_int(deposit_val)} UZS" if deposit_val else t(lang, "deposit-none")
+    advance_txt = f"{fmt_int(advance_val)} UZS" if advance_val else t(lang, "advance-none")
+
+    limit_txt = fmt_int(car.get("limit_km") or 0)
+    ins_txt = t(lang, "ins-included") if car.get("insurance_included") else t(lang, "ins-excluded")
+
+    driver_txt = t(lang, "yes") if car.get("car_with_driver") else t(lang, "no")
+    delivery_txt = t(lang, "yes") if car.get("delivery") else t(lang, "no")
+    child_txt = t(lang, "yes") if car.get("child_seat") else t(lang, "no")
+
+    age = car.get("age_access")
+    drive_exp = car.get("drive_exp")
+    passport_need = car.get("passport")
+
+    lines = [
+        t(lang, "terms-title", title=car["title"]),
+        t(lang, "terms-deposit", deposit=deposit_txt),
+        t(lang, "terms-advance", advance=advance_txt),
+        t(lang, "terms-limit",   limit=limit_txt),
+        t(lang, "terms-ins",     ins=ins_txt),
+        t(lang, "terms-driver",  has=driver_txt),
+        t(lang, "terms-delivery",has=delivery_txt),
+        t(lang, "terms-child",   has=child_txt),
+    ]
+
+    if age:
+        lines.append(t(lang, "terms-age", age=age))
+    if drive_exp:
+        lines.append(t(lang, "terms-drive-exp", years=drive_exp))
+    lines.append(
+        t(lang, "terms-passport", has=t(lang, "yes") if passport_need else t(lang, "no"))
     )
 
+    txt = "\n".join(lines)
     await c.message.answer(txt)
     await c.answer()
 
