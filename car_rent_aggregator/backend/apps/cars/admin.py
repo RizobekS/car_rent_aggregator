@@ -182,10 +182,11 @@ class CarAdmin(admin.ModelAdmin):
         (_("Условия и цены"), {
             "fields": (
                 "price_weekday", "price_weekend",
-                "deposit_band", "deposit_amount",
+                "deposit", "deposit_amount",
                 "limit_km",
                 "insurance_included", "child_seat",
                 "delivery", "car_with_driver",
+                "passport", "age_access", "drive_exp"
             )
         }),
     )

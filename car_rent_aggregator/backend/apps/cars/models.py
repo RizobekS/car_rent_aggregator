@@ -151,15 +151,12 @@ class Car(models.Model):
     price_weekday = models.DecimalField(_("Цена в будни, UZS"),    max_digits=12, decimal_places=2)
     price_weekend = models.DecimalField(_("Цена в выходные, UZS"), max_digits=12, decimal_places=2)
 
-    deposit_band = models.CharField(
-        _("Диапазон залога"),
-        max_length=10,
-        choices=[
-            ("none", _("Без залога")),
-            ("low", _("Низкий залог")),
-            ("high", _("Высокий залог")),
-        ],
-        default="low"
+    deposit = models.DecimalField(
+        _("Сумма Депозита, UZS"),
+        max_digits=12,
+        decimal_places=2,
+        null=True, blank=True,
+        help_text=_("Сумма депозита")
     )
     deposit_amount = models.DecimalField(
         _("Сумма аванса, UZS"),
@@ -169,8 +166,11 @@ class Car(models.Model):
         help_text=_("Если фиксированная сумма, иначе оставьте пустым")
     )
     limit_km = models.PositiveIntegerField(_("Суточный лимит, км"), default=200)
+    age_access = models.PositiveIntegerField(_("Допустимый возраст клиента (От)"), default=18)
+    drive_exp = models.PositiveIntegerField(_("Опыт вождения клиента в годах (От)"), default=1)
     delivery = models.BooleanField(_("Доставка авто возможна"), default=False)
     car_with_driver = models.BooleanField(_("Автомобиль с водителем"), default=False)
+    passport = models.BooleanField(_("Паспорт/ID карта клиента"), default=True)
 
     photo_file_id = models.CharField(_("Telegram file_id обложки"), max_length=200, blank=True)
     active = models.BooleanField(_("Опубликован"), default=True)

@@ -17,8 +17,11 @@ SEEN_PENDING: dict[int, set[int]] = {}   # chat_id -> set(booking_ids)
 # какие оплаты уже анонсировали как paid
 SEEN_PAID: dict[int, set[int]] = {}      # chat_id -> set(booking_ids)
 
+
 def _resolve_partner_lang() -> str:
+    # пока жёстко RU, если надо — можно сделать хранение языка партнёра в БД
     return "ru"
+
 
 def _fmt_date(iso: str) -> str:
     try:
@@ -27,6 +30,7 @@ def _fmt_date(iso: str) -> str:
         return datetime.fromisoformat(iso).strftime("%d.%m.%Y")
     except Exception:
         return iso[:10]
+
 
 def _left_minutes(created_iso: str | None) -> int | None:
     if not created_iso:
@@ -45,6 +49,7 @@ def _left_minutes(created_iso: str | None) -> int | None:
         left = 0
     return left
 
+
 def _kb_request_actions(bid: int) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
@@ -61,6 +66,7 @@ def _kb_request_actions(bid: int) -> InlineKeyboardMarkup:
         ]
     )
 
+
 async def _fetch_bookings(username: str | None, chat_id: int, status: str) -> list[dict]:
     api = ApiClient()
     params = {"status": status}
@@ -73,17 +79,18 @@ async def _fetch_bookings(username: str | None, chat_id: int, status: str) -> li
     finally:
         await api.close()
 
+
 async def notify_loop(bot: Bot, chat_id: int, username: str | None):
     """
     Каждые 20 сек:
-      • ищем новые pending заявки -> шлём карточку с кнопками ✅/❌
-      • ищем новые paid заявки -> шлём уведомление об оплате
+      • новые pending заявки -> карточка с кнопками ✅/❌
+      • новые paid заявки -> уведомление об оплате
     """
     lang = _resolve_partner_lang()
 
     while True:
         try:
-            # ---- pending заявки (новые запросы аренды)
+            # ---- pending заявки
             pendings = await _fetch_bookings(username, chat_id, status="pending")
             seen_p = SEEN_PENDING.setdefault(chat_id, set())
             for b in pendings:
@@ -126,8 +133,7 @@ async def notify_loop(bot: Bot, chat_id: int, username: str | None):
                 car = b.get("car_title") or f"#{b.get('car')}"
                 df = _fmt_date(b.get("date_from", ""))
                 dt = _fmt_date(b.get("date_to", ""))
-                mode = b.get("payment_mode")
-                # mode приходит как "full"/"adv" с сервера (мы договорились)
+                mode = (b.get("payment_mode") or "").lower()
                 if mode == "adv":
                     mode_txt = "аванс"
                 else:
@@ -142,26 +148,25 @@ async def notify_loop(bot: Bot, chat_id: int, username: str | None):
                 )
 
         except Exception:
-            # не падаем из-за одной ошибки
+            # не убиваем цикл
             pass
 
         await asyncio.sleep(20)
 
 
-# подписка/отписка такие же, только не меняем сигнатуры,
-# чтобы main.py и start.py не трогать.
-
 SUB_TASKS: dict[int, asyncio.Task] = {}
+
 
 def subscribe_partner(bot: Bot, chat_id: int, username: str | None):
     """
-    Включаем фоновые уведомления. Если задача уже есть — возвращаем False.
+    Включаем фоновые уведомления. Если задача уже есть — ничего не делаем.
     """
     tsk = SUB_TASKS.get(chat_id)
     if tsk and not tsk.done():
         return False
     SUB_TASKS[chat_id] = asyncio.create_task(notify_loop(bot, chat_id, username))
     return True
+
 
 def unsubscribe_partner(chat_id: int):
     tsk = SUB_TASKS.get(chat_id)

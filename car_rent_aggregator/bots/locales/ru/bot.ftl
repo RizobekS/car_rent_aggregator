@@ -201,3 +201,8 @@ suggest-tail = Чтобы продолжить поиск, нажмите «{men
 notify-confirmed = ✅ Бронь #{ $id } по авто «{ $title }» на { $start }–{ $end } подтверждена партнёром.
 notify-rejected = ❌ Бронь #{ $id } по авто «{ $title }» на { $start }–{ $end } отклонена партнёром.
 notify-expired = ⏳ Бронь #{ $id } по авто «{ $title }» на { $start }–{ $end } истекла/отменена.
+
+client-booking-paid =
+    ✅ Оплата брони #{ $id } по авто «{ $title }»
+    на { $date_from }–{ $date_to } успешно получена.
+    Бронь активна, приятной поездки!
