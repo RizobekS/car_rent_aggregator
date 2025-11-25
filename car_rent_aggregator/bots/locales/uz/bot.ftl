@@ -189,6 +189,9 @@ book-btn-cancel = ✖️ Bekor qilish
 book-canceled = So‘rov bekor qilindi.
 book-create-fail = So‘rovni yaratib bo‘lmadi: { $error }
 book-created = «{ $title }» mashinasini { $start } dan { $end } gacha ijaraga olish bo‘yicha so‘rov hamkorga yuborildi. Holat: Tekshiruvda.\nTasdiqlanganda/ rad etilganda xabarnoma olasiz.
+selfie-ask = Iltimos, selfi (yuz fotosurati) yuboring. Qabul qilinadigan formatlar: JPG/PNG.
+selfie-invalid = Iltimos, stiker yoki video emas, oddiy rasm (JPG/PNG) yuboring.
+selfie-save-fail = Selfi saqlanmadi: {error}
 
 my-no-items = Sizda hozircha bronlar yo‘q. Birinchi bronni rasmiylashtirish uchun «{$menu-find}» tugmasini bosing.
 my-error = Bronlar ro‘yxatini yuklab bo‘lmadi: { $error }

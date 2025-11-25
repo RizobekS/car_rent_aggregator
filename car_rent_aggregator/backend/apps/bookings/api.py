@@ -106,6 +106,7 @@ class BookingSerializer(serializers.ModelSerializer):
     car_title = serializers.CharField(source="car.title", read_only=True)
     partner_name = serializers.CharField(source="partner.name", read_only=True)
     client_tg_user_id = serializers.IntegerField(source="client.tg_user_id", read_only=True)
+    client_selfie_url = serializers.SerializerMethodField()
 
     # раскрываем для оплат/подсказок
     car_class      = serializers.CharField(source="car.car_class", read_only=True)
@@ -129,8 +130,22 @@ class BookingSerializer(serializers.ModelSerializer):
             "price_quote",
             "status", "payment_marker",
             "price_weekday", "price_weekend", "advance_amount",
-            "created_at", "updated_at",
+            "created_at", "updated_at", "client_selfie_url"
         )
+
+    def get_client_selfie_url(self, obj):
+        selfie = getattr(getattr(obj, "client", None), "selfie_image", None)
+        if not selfie:
+            return None
+        try:
+            request = self.context.get("request")
+        except Exception:
+            request = None
+        url = selfie.url
+        if request is not None:
+            return request.build_absolute_uri(url)
+        return url
+
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

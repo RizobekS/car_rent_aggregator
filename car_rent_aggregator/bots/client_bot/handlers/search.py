@@ -1,4 +1,6 @@
 # bots/client_bot/handlers/search.py
+import base64
+import io
 from pathlib import Path
 from datetime import datetime, date, timedelta
 import calendar
@@ -118,9 +120,8 @@ def kb_card_actions(lang: str, car_id: int) -> InlineKeyboardMarkup:
     """
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text=t(lang, "btn-more"),  callback_data=f"more:{car_id}"),
-         InlineKeyboardButton(text=t(lang, "btn-terms"), callback_data=f"terms:{car_id}")],
-        [InlineKeyboardButton(text=t(lang, "btn-reviews"), callback_data=f"reviews:{car_id}"),
-         InlineKeyboardButton(text=t(lang, "btn-book"),    callback_data=f"pick:{car_id}")],
+        InlineKeyboardButton(text=t(lang, "btn-reviews"), callback_data=f"reviews:{car_id}")],
+         [InlineKeyboardButton(text=t(lang, "btn-book"),    callback_data=f"pick:{car_id}")],
     ])
 
 def kb_confirm_booking(lang: str) -> InlineKeyboardMarkup:
@@ -173,8 +174,16 @@ def build_car_caption(car: dict, lang: str) -> str:
     top = t(lang, "card-top", title=title, year_part=year_part, mileage_part=mileage_part)
 
     # строка с классом и приводом
-    cls = car.get("car_class") or ""
-    class_label = t(lang, "label-class", value=cls) if cls else ""
+    class_key = {
+        "eco": "class-eco",
+        "comfort": "class-comfort",
+        "business": "class-business",
+        "premium": "class-premium",
+        "suv": "class-suv",
+        "minivan": "class-minivan",
+    }.get(str(car.get("car_class", "")).lower(), "")
+    class_label = t(lang, class_key) if class_key else ""
+    class_part = f" {t(lang, 'label-class', value=class_label)}" if class_label else ""
     drive_key = {
         "fwd": "drive-fwd",
         "rwd": "drive-rwd",
@@ -186,7 +195,7 @@ def build_car_caption(car: dict, lang: str) -> str:
     line2 = t(
         lang,
         "card-line2",
-        class_label=class_label,
+        class_part=class_part,
         drive_part=drive_part,
     )
 
@@ -594,10 +603,9 @@ async def show_reviews(c: CallbackQuery, state: FSMContext):
 async def pick_car(c: CallbackQuery, state: FSMContext):
     """
     1. Юзер нажал «Забронировать».
-    2. Мы показываем превью (машина, даты, примерная сумма).
-    3. Сохраняем pending_booking в FSM.
-    4. Переводим state -> BookingStates.CONFIRM.
-    ВАЖНО: НИЧЕГО ещё не создаём на бэке.
+    2. Сохраняем pending_booking в FSM.
+    3. Просим отправить селфи (обязательный шаг).
+    4. После селфи покажем превью и попросим подтвердить.
     """
     api = ApiClient()
     lang = await resolve_user_lang(api, c.from_user.id, await state.get_data())
@@ -637,7 +645,7 @@ async def pick_car(c: CallbackQuery, state: FSMContext):
         "date_to": date_to_iso,
     }
 
-    # сохраняем в state
+    # сохраняем в state всё, что понадобится на следующем шаге
     await state.update_data(
         pending_booking=payload,
         pending_booking_title=car.get("title"),
@@ -645,23 +653,97 @@ async def pick_car(c: CallbackQuery, state: FSMContext):
         pending_booking_days=days_cnt,
     )
 
-    # отправляем превью клиенту
-    preview_head = t(lang, "book-preview-head",
-                     title=car.get("title", ""),
-                     start=start_dt.strftime("%d.%m.%Y"),
-                     end=end_dt.strftime("%d.%m.%Y"))
-    preview_sum = t(lang, "book-preview-sum",
-                    sum=fmt_int(total_sum),
-                    days=days_cnt)
+    # просим селфи
+    await c.message.answer(t(lang, "selfie-ask"))
+    await state.set_state(BookingStates.SELFIE)
+    await c.answer()
+
+@router.message(BookingStates.SELFIE)
+async def got_selfie(m: Message, state: FSMContext):
+    """
+    Принимаем селфи:
+    - только photo или document с image/*
+    - скачиваем файл с Telegram
+    - шлём base64 на бэкенд (/users/selfie/)
+    - показываем превью брони + кнопки Подтвердить/Отмена
+    """
+    api = ApiClient()
+    lang = await resolve_user_lang(api, m.from_user.id, await state.get_data())
+    await api.close()
+
+    file_id = None
+
+    if m.photo:
+        file_id = m.photo[-1].file_id
+    elif m.document and m.document.mime_type and m.document.mime_type.startswith("image/"):
+        file_id = m.document.file_id
+
+    if not file_id:
+        await m.answer(t(lang, "selfie-invalid"))
+        return
+
+    # кладём file_id в FSM (на будущее, если пригодится)
+    await state.update_data(selfie_file_id=file_id)
+
+    # 🔽 качаем файл из Telegram
+    try:
+        tg_file = await m.bot.get_file(file_id)
+        buf = io.BytesIO()
+        await m.bot.download_file(tg_file.file_path, buf)
+        raw = buf.getvalue()
+        image_b64 = base64.b64encode(raw).decode("ascii")
+    except Exception as e:
+        await m.answer(t(lang, "selfie-save-fail", error=str(e)))
+        return
+
+    # 🔽 сохраняем/обновляем селфи на бэке
+    api = ApiClient()
+    try:
+        await api.post("/users/selfie/", json={
+            "tg_user_id": m.from_user.id,
+            "selfie_file_id": file_id,
+            "image_b64": image_b64,
+        })
+    except Exception as e:
+        await m.answer(t(lang, "selfie-save-fail", error=str(e)))
+    finally:
+        await api.close()
+
+    data = await state.get_data()
+    payload = data.get("pending_booking")
+    if not payload:
+        await m.answer(t(lang, "errors-missing-dates"))
+        await state.clear()
+        return
+
+    # собираем превью
+    start_dt = datetime.fromisoformat(payload["date_from"])
+    end_dt   = datetime.fromisoformat(payload["date_to"])
+    title    = data.get("pending_booking_title", "")
+    total_sum = data.get("pending_booking_total", 0)
+    days_cnt  = data.get("pending_booking_days", 0)
+
+    preview_head = t(
+        lang,
+        "book-preview-head",
+        title=title,
+        start=start_dt.strftime("%d.%m.%Y"),
+        end=end_dt.strftime("%d.%m.%Y"),
+    )
+    preview_sum = t(
+        lang,
+        "book-preview-sum",
+        sum=fmt_int(total_sum),
+        days=days_cnt,
+    )
     preview_ask = t(lang, "book-preview-ask")
 
-    await c.message.answer(
+    await m.answer(
         f"{preview_head}\n{preview_sum}\n\n{preview_ask}",
         reply_markup=kb_confirm_booking(lang)
     )
 
     await state.set_state(BookingStates.CONFIRM)
-    await c.answer()
 
 # подтверждение брони
 @router.callback_query(BookingStates.CONFIRM, F.data == "bk:confirm")

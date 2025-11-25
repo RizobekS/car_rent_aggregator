@@ -152,6 +152,15 @@ async def list_requests(m: Message, state: FSMContext):
             f"{ttl_line}"
         )
 
+        # сначала пробуем показать селфи клиента, если оно есть
+        selfie_url = b.get("client_selfie_url")
+        if selfie_url:
+            try:
+                await m.answer_photo(selfie_url)
+            except Exception:
+                # не убиваем логику, если картинка по URL не доступна
+                pass
+
         await m.answer(
             text,
             reply_markup=_kb_request_actions(bid),
@@ -212,6 +221,14 @@ async def cb_confirm(c: CallbackQuery, state: FSMContext):
         f"{df}–{dt}\n\n"
         f"{client_block}"
     )
+
+    # селфи клиента, если есть
+    selfie_url = booking.get("client_selfie_url")
+    if selfie_url:
+        try:
+            await c.message.answer_photo(selfie_url)
+        except Exception:
+            pass
 
     # пробуем отредактировать исходное сообщение (где были кнопки),
     # если не получится — шлём новое

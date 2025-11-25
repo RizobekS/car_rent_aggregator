@@ -15,5 +15,6 @@ class SearchStates(StatesGroup):
     RESULTS = State()
 
 class BookingStates(StatesGroup):
+    SELFIE = State()
     CONFIRM = State()
 

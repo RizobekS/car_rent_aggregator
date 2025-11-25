@@ -107,7 +107,7 @@ class-minivan = Minivan
 back-to-dates = « Back to dates
 
 card-top = 🚗 { $title }{ $year_part }{ $mileage_part }
-card-line2 = ⚙️ { $class_label }{ $drive_part }
+card-line2 = ⚙️ { $class_part }{ $drive_part }
 card-price = 🗓 Weekdays: { $wd } UZS/day\n📅 Weekends: { $we } UZS/day
 card-terms = 💳 Deposit: { $deposit }\n💳 Advance: { $advance }\n✒️ Mileage limit: { $limit } km/day\n🛡️ Insurance: { $ins }
 card-options-title = 🎁 Options:
@@ -178,6 +178,9 @@ book-btn-cancel = ✖️ Cancel
 book-canceled = Request cancelled.
 book-create-fail = Could not create the request: { $error }
 book-created = The rental request for “{ $title }” from { $start } to { $end } was sent to the partner. Status: Under review.\nYou will be notified upon confirmation/rejection.
+selfie-ask = Please submit a selfie (face photo). Acceptable formats: JPG/PNG.
+selfie-invalid = Please send a regular photo (JPG/PNG), not a sticker or video.
+selfie-save-fail = Selfie failed to save: {error}
 
 my-no-items = You have no bookings yet. Use “{$menu-find}” to make your first booking.
 my-error = Failed to load bookings: { $error }

@@ -12,6 +12,20 @@ class BotUser(models.Model):
     )
     username = models.CharField(_("Telegram username"), max_length=32, blank=True, null=True, db_index=True,
                                 help_text=_("Без @"))
+    selfie_file_id = models.CharField(
+        _("Telegram file_id селфи"),
+        max_length=200,
+        blank=True,
+        null=True,
+        help_text=_("Сырой file_id фото из Telegram для идентификации клиента")
+    )
+    selfie_image = models.ImageField(
+        _("Селфи"),
+        upload_to="selfies/%Y/%m/%d",
+        blank=True,
+        null=True,
+        help_text=_("Файл селфи, сохранённый из Telegram")
+    )
     phone = models.CharField(
         _("Телефон"),
         max_length=32,
