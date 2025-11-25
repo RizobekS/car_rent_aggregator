@@ -171,6 +171,7 @@ terms-car-not-found = Car not found
 reviews-soon = Reviews section is coming soon.
 errors-car-not-found = Car not found
 
+reg-before-booking = Please register to submit car reservation requests.
 book-confirm-q = You selected: { $title }\nPeriod: { $start } → { $end }\nEstimated: ~{ $sum } UZS for { $days } days.\n\nConfirm sending the request to the partner?
 book-ask-contact = You selected { $title }, { $start }–{ $end }\nPlease share your contact phone:
 book-btn-confirm = ✅ Confirm

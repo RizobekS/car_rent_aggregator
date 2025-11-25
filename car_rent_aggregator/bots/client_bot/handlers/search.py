@@ -16,7 +16,7 @@ from bots.shared.api_client import ApiClient
 from bots.shared.config import settings
 from bots.client_bot.states import SearchStates, BookingStates
 from bots.client_bot.poller import TRACK_BOOKINGS
-from bots.client_bot.handlers.start import is_find_btn
+from bots.client_bot.handlers.start import is_find_btn, kb_request_phone
 from bots.shared.i18n import t, resolve_user_lang, SUPPORTED
 
 router = Router()
@@ -748,10 +748,6 @@ async def got_selfie(m: Message, state: FSMContext):
 # подтверждение брони
 @router.callback_query(BookingStates.CONFIRM, F.data == "bk:confirm")
 async def booking_confirm(c: CallbackQuery, state: FSMContext):
-    """
-    Пользователь подтвердил отправку заявки.
-    Теперь реально создаём Booking через API.
-    """
     data = await state.get_data()
 
     api = ApiClient()
@@ -760,26 +756,52 @@ async def booking_confirm(c: CallbackQuery, state: FSMContext):
 
     payload = data.get("pending_booking")
     if not payload:
-        # если вдруг нет данных — что-то пошло не так
         await c.message.edit_text(t(lang, "errors-missing-dates"))
         await state.clear()
         return await c.answer()
 
-    # попытка создать бронь
     api = ApiClient()
     try:
         booking = await api.post("/bookings/", json=payload)
     except Exception as e:
         await api.close()
+        text_error = str(e)
+
+        # 🔥 если бэкенд сказал, что пользователь не заполнен
+        if "user_incomplete" in text_error:
+            # готовим данные для "отложенной" брони через регистрацию
+            pb = payload
+            await state.update_data(
+                selected_car_id=pb.get("car_id"),
+                selected_car_title=data.get("pending_booking_title"),
+                date_from=pb.get("date_from"),
+                date_to=pb.get("date_to"),
+            )
+            # переводим в состояние ввода телефона
+            await state.set_state(SearchStates.PHONE)
+
+            # сообщаем, что нужно зарегистрироваться
+            await c.message.edit_text(
+                t(lang, "reg-before-booking")
+            )
+            await c.message.answer(
+                t(lang, "phone-again"),
+                reply_markup=kb_request_phone(lang)
+            )
+            await c.answer()
+            return
+
+        # все остальные ошибки — как раньше
         await c.message.edit_text(
-            t(lang, "book-create-error", error=str(e))
+            t(lang, "book-create-error", error=text_error)
         )
         await state.clear()
-        return await c.answer()
+        await c.answer()
+        return
     finally:
         await api.close()
 
-    # добавляем в TRACK_BOOKINGS, чтобы поллер не спамил старыми статусами
+    # если дошли сюда — бронь создана успешно (как и раньше)
     try:
         TRACK_BOOKINGS.setdefault(c.from_user.id, set()).add(int(booking["id"]))
     except Exception:
@@ -789,15 +811,14 @@ async def booking_confirm(c: CallbackQuery, state: FSMContext):
     dfrom = (booking.get("date_from") or payload["date_from"])[:10]
     dto   = (booking.get("date_to")   or payload["date_to"])[:10]
 
-    # говорим юзеру что заявка ушла партнёру
     await c.message.edit_text(
         t(lang, "book-sent", title=title, start=dfrom, end=dto),
         reply_markup=None
     )
 
-    # очистка состояния
     await state.clear()
     await c.answer()
+
 
 # отмена брони до отправки
 @router.callback_query(BookingStates.CONFIRM, F.data == "bk:cancel")

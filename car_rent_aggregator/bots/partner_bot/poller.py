@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import asyncio
 from datetime import datetime, timezone as _tz
-
+import aiohttp
 from aiogram import Bot
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, BufferedInputFile
 
 from bots.shared.api_client import ApiClient
 from bots.shared.i18n import t
@@ -66,6 +66,27 @@ def _kb_request_actions(bid: int) -> InlineKeyboardMarkup:
         ]
     )
 
+async def _send_selfie_from_url(bot: Bot, chat_id: int, selfie_url: str) -> bool:
+    """
+    Качаем картинку по URL и отправляем её как файл.
+    Используется в автопуллере для новых заявок.
+    """
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(selfie_url) as resp:
+                if resp.status != 200:
+                    return False
+                raw = await resp.read()
+    except Exception:
+        return False
+
+    try:
+        file = BufferedInputFile(raw, filename="selfie.jpg")
+        await bot.send_photo(chat_id=chat_id, photo=file)
+        return True
+    except Exception:
+        return False
+
 
 async def _fetch_bookings(username: str | None, chat_id: int, status: str) -> list[dict]:
     api = ApiClient()
@@ -115,6 +136,12 @@ async def notify_loop(bot: Bot, chat_id: int, username: str | None):
                     f"{ttl_line}"
                 )
 
+                # 🧠 сначала пробуем отправить селфи клиента, если есть
+                selfie_url = b.get("client_selfie_url")
+                if selfie_url:
+                    await _send_selfie_from_url(bot, chat_id, selfie_url)
+
+                # затем сама карточка заявки
                 await bot.send_message(
                     chat_id,
                     text,

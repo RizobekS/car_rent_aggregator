@@ -182,6 +182,7 @@ terms-car-not-found = Avtomobil topilmadi
 reviews-soon = Fikr-mulohazalar bo‘limi tez orada ishga tushadi.
 errors-car-not-found = Avtomobil topilmadi
 
+reg-before-booking = Avtomobil buyurtma qilish uchun iltimos ro'yxatdan o'ting.
 book-confirm-q = Siz tanladingiz: { $title }\nDavr: { $start } → { $end }\nTaxminan: ~{ $sum } UZS ({ $days } kun).\n\nSo‘rovni hamkorga yuborishni tasdiqlaysizmi?
 book-ask-contact = Siz { $title } tanladingiz, { $start }–{ $end }\nAloqa uchun telefoningizni yuboring:
 book-btn-confirm = ✅ Tasdiqlash
@@ -189,7 +190,7 @@ book-btn-cancel = ✖️ Bekor qilish
 book-canceled = So‘rov bekor qilindi.
 book-create-fail = So‘rovni yaratib bo‘lmadi: { $error }
 book-created = «{ $title }» mashinasini { $start } dan { $end } gacha ijaraga olish bo‘yicha so‘rov hamkorga yuborildi. Holat: Tekshiruvda.\nTasdiqlanganda/ rad etilganda xabarnoma olasiz.
-selfie-ask = Iltimos, selfi (yuz fotosurati) yuboring. Qabul qilinadigan formatlar: JPG/PNG.
+selfie-ask = Arizani hamkorga yuborish uchun qisqa selfi kerak 📸\nRasm faqat shaxsni tasdiqlash uchun ishlatiladi.
 selfie-invalid = Iltimos, stiker yoki video emas, oddiy rasm (JPG/PNG) yuboring.
 selfie-save-fail = Selfi saqlanmadi: {error}
 

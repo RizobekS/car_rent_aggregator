@@ -15,6 +15,8 @@ class BotUserRegisterSerializer(serializers.ModelSerializer):
         model = BotUser
         fields = ("tg_user_id", "username", "first_name", "last_name", "phone", "language", "selfie_file_id")
         extra_kwargs = {
+            "tg_user_id": {"validators": []},
+
             "first_name": {"required": True, "allow_blank": False},
             "last_name":  {"required": True, "allow_blank": False},
             "phone":      {"required": True, "allow_blank": False},
