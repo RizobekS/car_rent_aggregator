@@ -236,7 +236,10 @@ class BookingViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         ser = self.get_serializer(data=request.data)
         ser.is_valid(raise_exception=True)
         booking = ser.save()
-        return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
+        return Response(
+            BookingSerializer(booking, context=self.get_serializer_context()).data,
+            status=status.HTTP_201_CREATED,
+        )
 
     def retrieve(self, request, pk=None):
         obj = self.get_queryset().get(pk=pk)
@@ -275,7 +278,7 @@ class BookingViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         CarCalendar.objects.create(car=booking.car, date_from=start, date_to=end, status="busy")
         booking.status = "confirmed"
         booking.save(update_fields=["status", "updated_at"])
-        return Response(BookingSerializer(booking).data)
+        return Response(BookingSerializer(booking, context=self.get_serializer_context()).data)
 
     @action(detail=True, methods=["post"])
     def reject(self, request, pk=None):
@@ -296,7 +299,10 @@ class BookingViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
         booking.status = "rejected"
         booking.save(update_fields=["status", "updated_at"])
-        ser = BookingSerializer(booking, context={"redact_client": True})
+        ser = BookingSerializer(
+            booking,
+            context={**self.get_serializer_context(), "redact_client": True},
+        )
         return Response(ser.data)
 
     @action(detail=True, methods=["post"])
@@ -319,7 +325,7 @@ class BookingViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         if booking.status == "pending":
             booking.status = "canceled"
             booking.save(update_fields=["status", "updated_at"])
-            return Response(BookingSerializer(booking).data)
+            return Response(BookingSerializer(booking, context=self.get_serializer_context()).data)
 
         # confirmed & не оплачено & вышел TTL -> отменяем + освобождаем слот
         if booking.status == "confirmed" and (booking.payment_marker or "").lower() != "paid":
@@ -328,7 +334,7 @@ class BookingViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 _free_slot()
                 booking.status = "canceled"
                 booking.save(update_fields=["status", "updated_at"])
-                return Response(BookingSerializer(booking).data)
+                return Response(BookingSerializer(booking, context=self.get_serializer_context()).data)
 
         return Response({"detail": _("Отмена невозможна: бронь уже обработана.")}, status=400)
 

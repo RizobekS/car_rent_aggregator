@@ -1,6 +1,7 @@
 # bots/partner_bot/handlers/requests.py
 from __future__ import annotations
-
+import aiohttp
+from aiogram.types import BufferedInputFile
 from datetime import datetime, timezone as _tz
 
 from aiogram import Router, F
@@ -25,6 +26,28 @@ HOLD_MINUTES = 20  # дедлайн на подтверждение/отклон
 def _resolve_partner_lang() -> str:
     # пока только ru, в будущем можно хранить язык партнёра
     return "ru"
+
+async def _send_selfie_from_url(bot, chat_id: int, selfie_url: str) -> bool:
+    """
+    Качаем картинку по URL и отправляем её как файл.
+    Работает даже если Telegram не может сам сходить по URL.
+    """
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(selfie_url) as resp:
+                if resp.status != 200:
+                    return False
+                raw = await resp.read()
+    except Exception:
+        return False
+
+    try:
+        file = BufferedInputFile(raw, filename="selfie.jpg")
+        await bot.send_photo(chat_id=chat_id, photo=file)
+        return True
+    except Exception:
+        return False
+
 
 def _fmt_dt_short(iso: str) -> str:
     """
@@ -152,14 +175,9 @@ async def list_requests(m: Message, state: FSMContext):
             f"{ttl_line}"
         )
 
-        # сначала пробуем показать селфи клиента, если оно есть
         selfie_url = b.get("client_selfie_url")
         if selfie_url:
-            try:
-                await m.answer_photo(selfie_url)
-            except Exception:
-                # не убиваем логику, если картинка по URL не доступна
-                pass
+            ok = await _send_selfie_from_url(m.bot, m.chat.id, selfie_url)
 
         await m.answer(
             text,
@@ -222,16 +240,10 @@ async def cb_confirm(c: CallbackQuery, state: FSMContext):
         f"{client_block}"
     )
 
-    # селфи клиента, если есть
     selfie_url = booking.get("client_selfie_url")
     if selfie_url:
-        try:
-            await c.message.answer_photo(selfie_url)
-        except Exception:
-            pass
+        await _send_selfie_from_url(c.bot, c.message.chat.id, selfie_url)
 
-    # пробуем отредактировать исходное сообщение (где были кнопки),
-    # если не получится — шлём новое
     try:
         await c.message.edit_text(text, reply_markup=None)
     except Exception:
