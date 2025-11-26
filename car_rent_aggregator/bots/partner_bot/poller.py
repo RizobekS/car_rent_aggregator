@@ -1,4 +1,3 @@
-# bots/partner_bot/poller.py
 from __future__ import annotations
 
 import asyncio
@@ -66,6 +65,7 @@ def _kb_request_actions(bid: int) -> InlineKeyboardMarkup:
         ]
     )
 
+
 async def _send_selfie_from_url(bot: Bot, chat_id: int, selfie_url: str) -> bool:
     """
     Качаем картинку по URL и отправляем её как файл.
@@ -88,24 +88,47 @@ async def _send_selfie_from_url(bot: Bot, chat_id: int, selfie_url: str) -> bool
         return False
 
 
-async def _fetch_bookings(username: str | None, chat_id: int, status: str) -> list[dict]:
+async def _fetch_bookings(username: str | None, chat_id: int, status: str | None = None) -> list[dict]:
+    """
+    Универсальный helper:
+      - если status задан -> фильтрация по статусу
+      - если None -> без фильтра по статусу
+    """
     api = ApiClient()
-    params = {"status": status}
+    params: dict[str, str | int] = {}
+    if status:
+        params["status"] = status
+
     if username:
         params["partner_username"] = username
     else:
         params["partner_tg_user_id"] = chat_id
+
     try:
         return await api.get("/bookings/", params=params)
     finally:
         await api.close()
 
 
+async def _fetch_paid_bookings(username: str | None, chat_id: int) -> list[dict]:
+    """
+    Получаем брони партнёра, у которых payment_marker = 'paid'.
+    Статус брони (confirmed/completed/...) неважен.
+    """
+    items = await _fetch_bookings(username, chat_id, status=None)
+    result: list[dict] = []
+    for b in items:
+        pm = (b.get("payment_marker") or "").lower()
+        if pm == "paid":
+            result.append(b)
+    return result
+
+
 async def notify_loop(bot: Bot, chat_id: int, username: str | None):
     """
     Каждые 20 сек:
       • новые pending заявки -> карточка с кнопками ✅/❌
-      • новые paid заявки -> уведомление об оплате
+      • новые оплаченные заявки (payment_marker=paid) -> уведомление об оплате
     """
     lang = _resolve_partner_lang()
 
@@ -148,8 +171,8 @@ async def notify_loop(bot: Bot, chat_id: int, username: str | None):
                     reply_markup=_kb_request_actions(bid),
                 )
 
-            # ---- paid заявки (клиент оплатил)
-            paids = await _fetch_bookings(username, chat_id, status="paid")
+            # ---- оплаченные заявки (payment_marker=paid)
+            paids = await _fetch_paid_bookings(username, chat_id)
             seen_paid = SEEN_PAID.setdefault(chat_id, set())
             for b in paids:
                 bid = b["id"]
@@ -175,7 +198,7 @@ async def notify_loop(bot: Bot, chat_id: int, username: str | None):
                 )
 
         except Exception:
-            # не убиваем цикл
+            # не убиваем цикл даже при ошибках
             pass
 
         await asyncio.sleep(20)

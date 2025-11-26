@@ -207,9 +207,11 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
             for b in items:
                 bid = b.get("id")
                 st = b.get("status")
+                pm = (b.get("payment_marker") or "").lower()
                 if bid is None or st is None:
                     continue
 
+                state = f"{st}|{pm}"
                 prev = known.get(bid)
                 title = b.get("car_title") or b.get("car") or "—"
                 dfrom_iso = b.get("date_from", "")
@@ -229,22 +231,7 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
 
                     # если бронь уже НЕ pending, значит партнёр успел обработать её
                     # до того, как поллер её увидел → всё равно шлём уведомление
-                    if st == "confirmed":
-                        await bot.send_message(
-                            chat_id,
-                            t(
-                                lang,
-                                "client-booking-confirmed",
-                                id=bid,
-                                title=title,
-                                date_from=dfrom,
-                                date_to=dto,
-                            ),
-                            reply_markup=kb_payment(lang)
-                        )
-                        log.info("Booking %s for chat %s initial status confirmed", bid, chat_id)
-
-                    elif st == "paid":
+                    if pm == "paid":
                         await bot.send_message(
                             chat_id,
                             t(
@@ -259,7 +246,22 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                                 partner_address=partner_address,
                             ),
                         )
-                        log.info("Booking %s for chat %s initial status paid", bid, chat_id)
+                        log.info("Booking %s for chat %s initial state %s (marker=paid)", bid, chat_id, st)
+
+                    elif st == "confirmed":
+                        await bot.send_message(
+                            chat_id,
+                            t(
+                                lang,
+                                "client-booking-confirmed",
+                                id=bid,
+                                title=title,
+                                date_from=dfrom,
+                                date_to=dto,
+                            ),
+                            reply_markup=kb_payment(lang)
+                        )
+                        log.info("Booking %s for chat %s initial status confirmed", bid, chat_id)
 
                     elif st == "rejected":
                         await bot.send_message(
@@ -314,27 +316,10 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                     continue
 
                 # статус изменился
-                known[bid] = st
+                known[bid] = state
 
-                if st == "confirmed":
-                    await bot.send_message(
-                        chat_id,
-                        t(
-                            lang,
-                            "client-booking-confirmed",
-                            id=bid,
-                            title=title,
-                            date_from=dfrom,
-                            date_to=dto,
-                        ),
-                        reply_markup=kb_payment(lang)
-                    )
-
-                elif st == "paid":
-                    # УСПЕШНАЯ ОПЛАТА
-                    # ВАЖНО: здесь НЕТ повторного текста "подтверждена партнёром",
-                    # только факт оплаты.
-                    # ТЕКСТ: client-booking-paid
+                # 1) успешная оплата — реагируем на payment_marker
+                if pm == "paid" and (prev is None or not prev.endswith("|paid")):
                     await bot.send_message(
                         chat_id,
                         t(
@@ -348,6 +333,19 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                             partner_phone=partner_phone,
                             partner_address=partner_address,
                         ),
+                    )
+                elif st == "confirmed":
+                    await bot.send_message(
+                        chat_id,
+                        t(
+                            lang,
+                            "client-booking-confirmed",
+                            id=bid,
+                            title=title,
+                            date_from=dfrom,
+                            date_to=dto,
+                        ),
+                        reply_markup=kb_payment(lang)
                     )
 
                 elif st == "rejected":
