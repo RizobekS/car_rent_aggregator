@@ -16,6 +16,50 @@ status-canceled = Bekor qilindi
 status-rejected = Rad etilgan
 status-expired = Muddati tugagan
 
+client-booking-confirmed =
+    ✅ Broningiz tasdiqlandi!
+    🚗 Mashina: { $title }
+    🆔 Buyurtma raqami: #{ $id }
+    📅 Davr: { $date_from } – { $date_to }
+    ℹ️ Tez orada siz bilan bogʻlanishlari mumkin. Iltimos, telefoningizni yoningizda saqlang.
+
+client-booking-paid =
+    💳 Toʻlov muvaffaqiyatli yakunlandi!
+    🚗 Mashina: { $title }
+    🆔 Buyurtma raqami: #{ $id }
+    📅 Davr: { $date_from } – { $date_to }
+    👤 Hamkor: { $partner_name }
+    ☎️ Telefon: { $partner_phone }
+    📍  Manzil: { $partner_address }
+    ✅ Broningiz toʻliq tasdiqlandi. Yoqimli safar tilaymiz!
+
+client-booking-rejected =
+    ❌ Afsuski, broningiz rad etildi.
+    🚗 Mashina: { $title }
+    🆔 Buyurtma raqami: #{ $id }
+    📅 Davr: { $date_from } – { $date_to }
+    ℹ️ Quyida boshqa variantlarni taklif qilamiz.
+
+client-booking-expired =
+    ⏳ Bronlash vaqti tugadi.
+    🚗 Mashina: { $title }
+    🆔 Buyurtma raqami: #{ $id }
+    📅 Davr: { $date_from } – { $date_to }
+    ℹ️ Tasdiqlanmaganligi sababli bron avtomatik ravishda bekor qilindi. Siz uchun oʻxshash variantlarni tanlab beramiz.
+
+client-booking-suggest-item =
+    • { $title } — { $price_weekday } soʻm/kun (ish kunlari), { $price_weekend } soʻm/kun (dam olish)
+
+client-booking-suggest-list =
+    🔁 Siz uchun oʻxshash avtomobillar:
+    { $cars }
+    ℹ️ Agar kerakli variantni topmasangiz, sanalarni yoki avtomobil sinfni oʻzgartirib koʻring.
+
+client-booking-suggest-empty =
+    😔 Hozircha shu muddat uchun mos boʻsh avtomobil topilmadi.
+    ℹ️ Iltimos, sanalarni yoki avtomobil sinfini oʻzgartirib qayta urinish qilib koʻring.
+
+
 # заголовок "мои брони"
 my-head = Arizalar to‘plami:
 my-no-items = Hozirda sizda ariza mavjud emas. Avtomobil topish uchun, «{ $menu_find }», tugmasini bosing.
@@ -44,10 +88,6 @@ errors-missing-dates = Ariza qoldirish uchun ma‘lumotlar etarli emas. Qidiruvn
 
 # choose pay type (оставляем как было)
 pay-choose = To‘lov turini tanlang:\n
-pay-mode-full = To'liq narx
-pay-mode-adv  = Oldindan to‘lov
-pay-choose-full = To‘lov turini tanlang (to‘liq narx):
-pay-choose-adv  = To‘lov turini tanlang (oldindan to‘lov):
 pay-gw-picked = Siz to‘lov turi uchun { $gw } ({ $mode }) ni tanladingiz.\nSizning ariza raqamingiz: #{ $bid }.
 pay-instruction = To‘lov sahifasiga o‘tish uchun, To‘lash tugmasini bosing.
 pay-go = 💳 To‘lash
@@ -201,13 +241,20 @@ my-line = #{ $id } • { $title } • { $status }\n{ $from_ } → { $to }
 
 status-paid = ✅ #{id} ("{$title}") so'rovi uchun to'lov qabul qilindi. Rahmat!
 
+pay-mode-full = 💳 To‘liq to‘lov ({amount} so‘m)
+pay-mode-adv = 🔖 Oldindan to‘lov ({amount} so‘m)
+
+pay-choose-type = 💰 To‘lov turini tanlang:
+pay-choose-provider = 💳 To‘lov tizimini tanlang:
+
+pay-open-link = 🔗 To‘lovni amalga oshirish uchun quyidagi havolani bosing:
+pay-amount-zero = ⚠️ To‘lov yaratilmaydi: summa 0 ga teng.
+
 pay-choose-full = To‘liq to‘lov uchun to‘lov tizimini tanlang:
 pay-choose-adv = Oldindan to‘lov uchun to‘lov tizimini tanlang:
 pay-choose = To'lov turini tanlang:
 pay-back = Oldingi xabarga qaytib, to‘lov variantini tanlang.
 pay-gw-picked = Siz { $gw } orqali ({ $mode }) to‘lovni tanladingiz.\n\nSo‘rov raqami: #{ $bid }.
-pay-mode-full = to‘liq summa
-pay-mode-adv = avans
 pay-full-btn = 💳 To‘liq to‘lash ({ $total } UZS)
 pay-adv-btn = 💸 Avans to‘lash ({ $adv } UZS)
 pay-go = 💳 To‘lash

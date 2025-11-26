@@ -9,17 +9,32 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (
     Message, CallbackQuery, FSInputFile,
-    InlineKeyboardMarkup, InlineKeyboardButton
+    InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 )
 
 from bots.shared.api_client import ApiClient
 from bots.shared.config import settings
 from bots.client_bot.states import SearchStates, BookingStates
 from bots.client_bot.poller import TRACK_BOOKINGS
-from bots.client_bot.handlers.start import is_find_btn, kb_request_phone
+from bots.client_bot.handlers.start import is_find_btn, kb_request_phone, main_menu
 from bots.shared.i18n import t, resolve_user_lang, SUPPORTED
 
 router = Router()
+
+def kb_context_search_menu(lang: str) -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text=t(lang, "menu-change-class")),
+             KeyboardButton(text=t(lang, "menu-change-dates"))],
+        ],
+        resize_keyboard=True
+    )
+
+def is_change_class_btn(text: str) -> bool:
+    return any(text == t(lg, "menu-change-class") for lg in SUPPORTED)
+
+def is_change_dates_btn(text: str) -> bool:
+    return any(text == t(lg, "menu-change-dates") for lg in SUPPORTED)
 
 # ---------- служебные форматтеры ----------
 def fmt_int(n) -> str:
@@ -506,8 +521,56 @@ async def do_search(msg: Message, state: FSMContext, user_id: int):
             await msg.answer("📄 " + caption, reply_markup=markup)
 
     # после выдачи карточек даём человеку возможность сменить класс/дату
-    await msg.answer(t(lang, "search-classes-head"), reply_markup=kb_classes_inline_again(lang))
+    await msg.answer(
+        t(lang, "search-context-actions"),
+        reply_markup=kb_context_search_menu(lang)
+    )
     await state.set_state(SearchStates.RESULTS)
+
+@router.message(SearchStates.RESULTS, F.text.func(is_change_class_btn))
+async def change_class_from_menu(m: Message, state: FSMContext):
+    """
+    Пользователь нажал «Изменить класс авто» в контекстном меню.
+    Даты оставляем, просто возвращаем на шаг выбора класса.
+    """
+    api = ApiClient()
+    lang = await resolve_user_lang(api, m.from_user.id, await state.get_data())
+    await api.close()
+
+    await state.set_state(SearchStates.CLASS)
+    await m.answer(
+        t(lang, "search-classes-head"),
+        reply_markup=kb_class_with_back(lang),
+    )
+
+@router.message(SearchStates.RESULTS, F.text.func(is_change_dates_btn))
+async def change_dates_from_menu(m: Message, state: FSMContext):
+    """
+    Пользователь нажал «Изменить даты» в контекстном меню.
+    Очищаем даты, но оставляем выбранный класс (если был),
+    и возвращаемся на шаг выбора начальной даты.
+    """
+    api = ApiClient()
+    lang = await resolve_user_lang(api, m.from_user.id, await state.get_data())
+    await api.close()
+
+    data = await state.get_data()
+    car_class = data.get("car_class")
+
+    await state.update_data(
+        date_from=None,
+        date_to=None,
+        results=None,
+        pending_booking=None,
+        car_class=car_class,  # класс сохраняем
+    )
+
+    await state.set_state(SearchStates.DATE_FROM)
+    today = date.today()
+    await m.answer(
+        t(lang, "search-date-from"),
+        reply_markup=build_calendar(today.year, today.month, lang, min_sel=today),
+    )
 
 # ---------- кнопки под карточками ----------
 @router.callback_query(SearchStates.RESULTS, F.data.startswith("more:"))
@@ -654,7 +717,10 @@ async def pick_car(c: CallbackQuery, state: FSMContext):
     )
 
     # просим селфи
-    await c.message.answer(t(lang, "selfie-ask"))
+    await c.message.answer(
+        t(lang, "selfie-ask"),
+        reply_markup=main_menu(lang),
+    )
     await state.set_state(BookingStates.SELFIE)
     await c.answer()
 

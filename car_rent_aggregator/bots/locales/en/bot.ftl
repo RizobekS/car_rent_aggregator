@@ -18,6 +18,50 @@ status-canceled = Canceled
 status-rejected = Rejected
 status-expired = Expired
 
+client-booking-confirmed =
+    ✅ Your booking has been confirmed!
+    🚗 Car: { $title }
+    🆔 Booking ID: #{ $id }
+    📅 Period: { $date_from } – { $date_to }
+    ℹ️ The partner may contact you to clarify details. Please keep your phone available.
+
+client-booking-paid =
+    💳 Payment completed successfully!
+    🚗 Car: { $title }
+    🆔 Booking ID: #{ $id }
+    📅 Period: { $date_from } – { $date_to }
+    👤 Partner: { $partner_name }
+    ☎️ Phone: { $partner_phone }
+    📍  Address: { $partner_address }
+    ✅ Your booking is fully confirmed. Have a great trip!
+
+client-booking-rejected =
+    ❌ Unfortunately, your booking request was rejected.
+    🚗 Car: { $title }
+    🆔 Booking ID: #{ $id }
+    📅 Period: { $date_from } – { $date_to }
+    ℹ️ The car is not available for these dates. We’ve selected some similar options for you below.
+
+client-booking-expired =
+    ⏳ Booking hold time has expired.
+    🚗 Car: { $title }
+    🆔 Booking ID: #{ $id }
+    📅 Period: { $date_from } – { $date_to }
+    ℹ️ The request was automatically cancelled because it wasn’t confirmed in time. We’ll show you similar cars for these dates.
+
+client-booking-suggest-item =
+    • { $title } — { $price_weekday } UZS/day (weekdays), { $price_weekend } UZS/day (weekends)
+
+client-booking-suggest-list =
+    🔁 Similar cars you may like:
+    { $cars }
+    ℹ️ If none of these options works, try changing your dates or car class.
+
+client-booking-suggest-empty =
+    😔 We couldn’t find suitable available cars for the selected dates.
+    ℹ️ Please try adjusting the dates or choosing a different car class.
+
+
 # заголовок "мои брони"
 my-head = List of your bookings:
 my-no-items = You have no active bookings. Click "{ $menu_find }" to search for a car.
@@ -47,10 +91,6 @@ errors-missing-dates = Not enough information to make a reservation. Please sear
 
 # choose pay type (оставляем как было)
 pay-choose = Select payment type:\n
-pay-mode-full = total amount
-pay-mode-adv  = advance payment
-pay-choose-full = Select payment method (full amount):
-pay-choose-adv  = Select payment method (advance payment):
 pay-gw-picked = You have chosen to pay via { $gw } ({ $mode }).\nYour bid number: #{ $bid }.
 pay-instruction = Click the button to go to the payment page.
 pay-go = 💳 Pay
@@ -191,13 +231,20 @@ my-line = #{ $id } • { $title } • { $status }\n{ $from_ } → { $to }
 
 status-paid = ✅ Payment for request #{id} ("{$title}") has been received. Thank you!
 
+pay-mode-full = 💳 Full payment ({ $amount } UZS)
+pay-mode-adv = 🔖 Advance payment ({ $amount } UZS)
+
+pay-choose-type = 💰 Select payment type:
+pay-choose-provider = 💳 Select a payment system:
+
+pay-open-link = 🔗 Click the link below to proceed with the payment:
+pay-amount-zero = ⚠️ Cannot create payment: amount is zero.
+
 pay-choose-full = Choose a payment provider for full payment:
 pay-choose = Select payment type:
 pay-choose-adv = Choose a payment provider for the advance payment:
 pay-back = Go back to the previous message and choose a payment option.
 pay-gw-picked = You chose to pay via { $gw } ({ $mode }).\n\nYour request number: #{ $bid }.
-pay-mode-full = full amount
-pay-mode-adv = advance
 pay-full-btn = 💳 Pay full amount ({ $total } UZS)
 pay-adv-btn = 💸 Pay advance ({ $adv } UZS)
 pay-go = 💳 Pay

@@ -18,3 +18,10 @@ class BookingStates(StatesGroup):
     SELFIE = State()
     CONFIRM = State()
 
+
+class PaymentStates(StatesGroup):
+    AWAIT_METHOD = State()
+    AWAIT_TYPE = State()
+    AWAIT_PROVIDER = State()
+
+

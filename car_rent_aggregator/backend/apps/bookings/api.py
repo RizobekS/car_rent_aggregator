@@ -105,6 +105,8 @@ class BookingCreateSerializer(serializers.ModelSerializer):
 class BookingSerializer(serializers.ModelSerializer):
     car_title = serializers.CharField(source="car.title", read_only=True)
     partner_name = serializers.CharField(source="partner.name", read_only=True)
+    partner_phone = serializers.CharField(source="partner.phone", read_only=True)
+    partner_address = serializers.CharField(source="partner.address", read_only=True)
     client_tg_user_id = serializers.IntegerField(source="client.tg_user_id", read_only=True)
     client_selfie_url = serializers.SerializerMethodField()
 
@@ -123,7 +125,7 @@ class BookingSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "car", "car_title", "car_class",
-            "partner", "partner_name",
+            "partner", "partner_name", "partner_phone", "partner_address",
             "client", "client_tg_user_id", "client_first_name", "client_last_name", "client_username",
             "client_phone",
             "date_from", "date_to",

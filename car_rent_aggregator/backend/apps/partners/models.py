@@ -17,6 +17,13 @@ class Partner(models.Model):
         max_length=50,
         blank=True
     )
+    address = models.CharField(
+        _("Адрес"),
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text=_("Адрес партнера")
+    )
     email = models.EmailField(
         _("Email"),
         blank=True

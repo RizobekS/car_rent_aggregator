@@ -7,7 +7,7 @@ from apps.common.choices import PartnerStatus
 
 @admin.register(Partner)
 class PartnerAdmin(TranslationAdmin, admin.ModelAdmin):
-    list_display = ("id", "name", "status", "phone", "email", "created_at")
+    list_display = ("id", "name", "status", "phone", "address", "email", "created_at")
     list_filter  = ("status", "created_at")
     search_fields = ("name", "phone", "email")
     readonly_fields = ("created_at", "updated_at")

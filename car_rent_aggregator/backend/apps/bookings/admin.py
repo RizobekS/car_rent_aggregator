@@ -1,6 +1,7 @@
 # apps/bookings/admin.py
 from datetime import timedelta
-from django.contrib import admin
+from django.utils import timezone
+from django.contrib import admin, messages
 from django.utils.translation import gettext_lazy as _
 from .models import Booking, BookingExtension
 
@@ -77,6 +78,29 @@ def _calc_partner_net(booking: Booking) -> float:
     return round(total - fee, 2)
 
 
+@admin.action(description="Отметить как оплачено (ручная проверка)")
+def mark_as_paid(modeladmin, request, queryset):
+    """
+    Админ-действие для ручной проверки poller'а:
+    проставляет payment_marker='paid' и, при желании, status='paid'.
+    """
+    updated = 0
+    for booking in queryset:
+        # Если уже помечено как оплачено — пропускаем
+        if (booking.payment_marker or "").lower() == "paid":
+            continue
+
+        booking.payment_marker = "paid"
+
+        booking.status = "paid"
+
+        booking.updated_at = timezone.now()
+        booking.save(update_fields=["payment_marker", "status", "updated_at"])
+        updated += 1
+
+    messages.success(request, f"Отмечено как оплачено: {updated} броней.")
+
+
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
     """
@@ -105,6 +129,7 @@ class BookingAdmin(admin.ModelAdmin):
     list_filter = ("status", "partner")
     search_fields = ("id", "car__title", "partner__name")
     date_hierarchy = "created_at"
+    actions = [mark_as_paid]
     inlines = [BookingExtensionInline]
 
     # ====== Вспомогательная логика ======
