@@ -227,10 +227,9 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
 
                 # первое появление брони в кеше
                 if prev is None:
-                    known[bid] = st
+                    # запоминаем полное состояние: статус + маркер оплаты
+                    known[bid] = state
 
-                    # если бронь уже НЕ pending, значит партнёр успел обработать её
-                    # до того, как поллер её увидел → всё равно шлём уведомление
                     if pm == "paid":
                         await bot.send_message(
                             chat_id,
@@ -311,11 +310,11 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
 
                     continue
 
-                # если статус не изменился — ничего не шлём
-                if prev == st:
+                # если состояние (status + payment_marker) не изменилось — ничего не шлём
+                if prev == state:
                     continue
 
-                # статус изменился
+                # состояние изменилось
                 known[bid] = state
 
                 # 1) успешная оплата — реагируем на payment_marker
