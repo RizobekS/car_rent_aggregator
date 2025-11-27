@@ -87,8 +87,8 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
                     is_test_mode=cfg["IS_TEST_MODE"],
                 )
                 res = gw.create_payment(
-                    id=booking.id,  # для Payme оставляем booking.id
-                    amount=int(validated["amount"]) * 100,
+                    id=payment.id,
+                    amount=int(payment.amount) * 100,  # amount в тиынах
                     return_url=settings.BOT_PAY_RETURN_URL,
                 )
                 raw_meta.update({"payme_create": res} if isinstance(res, dict) else {})

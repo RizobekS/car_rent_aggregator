@@ -149,7 +149,7 @@ PAYTECHUZ = {
 
         "ACCOUNT_MODEL":   "apps.payments.models.Payment",
         "ACCOUNT_FIELD":   "id",
-        "AMOUNT_FIELD":    "price_quote",
+        "AMOUNT_FIELD":    "amount",
         "ONE_TIME_PAYMENT": True,
         "IS_TEST_MODE":    False,
     },
