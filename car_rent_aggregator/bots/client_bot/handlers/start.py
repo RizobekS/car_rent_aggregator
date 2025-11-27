@@ -130,6 +130,20 @@ async def set_language(c: CallbackQuery, state: FSMContext):
     )
     await c.answer()
 
+@router.message(F.text.func(is_help_btn))
+async def help_message(m: Message, state: FSMContext):
+    api = ApiClient()
+    lang = await resolve_user_lang(api, m.from_user.id, await state.get_data())
+    await api.close()
+
+    # Текст помощи (как ты просил)
+    text = (
+        "Обратитесь за помощью, если у вас возникли вопросы по поводу нашей системы.\n\n"
+        "Контакт: @Contactaaa"
+    )
+
+    await m.answer(text)
+
 # ===== Регистрация =====
 
 # 1) Телефон кнопкой
