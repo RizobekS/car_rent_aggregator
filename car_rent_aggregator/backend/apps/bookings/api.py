@@ -119,6 +119,18 @@ class BookingSerializer(serializers.ModelSerializer):
     client_first_name = serializers.CharField(source="client.first_name", read_only=True)
     client_last_name  = serializers.CharField(source="client.last_name", read_only=True)
     client_username   = serializers.CharField(source="client.username", read_only=True)
+    client_birth_date = serializers.DateField(
+        source="client.birth_date",
+        format="%d.%m.%Y",
+        allow_null=True,
+        required=False,
+    )
+    client_drive_exp = serializers.IntegerField(
+        source="client.drive_exp",
+        allow_null=True,
+        required=False,
+    )
+    client_age_years = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
@@ -126,13 +138,23 @@ class BookingSerializer(serializers.ModelSerializer):
             "id",
             "car", "car_title", "car_class",
             "partner", "partner_name", "partner_phone", "partner_address",
-            "client", "client_tg_user_id", "client_first_name", "client_last_name", "client_username",
-            "client_phone",
-            "date_from", "date_to",
-            "price_quote",
-            "status", "payment_marker",
+            "client", "client_tg_user_id", "client_first_name",
+            "client_last_name", "client_username",
+            "client_phone", "date_from", "date_to",
+            "price_quote", "status", "payment_marker",
             "price_weekday", "price_weekend", "advance_amount",
-            "created_at", "updated_at", "client_selfie_url"
+            "created_at", "updated_at", "client_selfie_url", "client_birth_date",
+            "client_drive_exp", "client_age_years",
+        )
+
+    def get_client_age_years(self, obj):
+        from datetime import date
+        bdate = getattr(obj.client, "birth_date", None)
+        if not bdate:
+            return None
+        today = date.today()
+        return today.year - bdate.year - (
+                (today.month, today.day) < (bdate.month, bdate.day)
         )
 
     def get_client_selfie_url(self, obj):

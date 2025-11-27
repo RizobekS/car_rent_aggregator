@@ -152,11 +152,24 @@ async def notify_loop(bot: Bot, chat_id: int, username: str | None):
                 if left_min is not None:
                     ttl_line = f"\n⏳ Осталось ~{left_min} мин."
 
+                age = b.get("client_age_years")
+                drive_exp = b.get("client_drive_exp")
+
+                client_line = ""
+                parts = []
+                if age:
+                    parts.append(f"Возраст клиента: {age}")
+                if drive_exp:
+                    parts.append(f"Стаж вождения: {drive_exp} лет")
+                if parts:
+                    client_line = "\n" + " | ".join(parts)
+
                 text = (
                     f"🆕 Новая заявка #{bid}\n"
                     f"Авто: {car}\n"
                     f"{df}–{dt}"
                     f"{ttl_line}"
+                    f"{client_line}"
                 )
 
                 # 🧠 сначала пробуем отправить селфи клиента, если есть

@@ -113,6 +113,12 @@ reg-last-short = Last name is too short. Please try again.
 reg-ok = Registration completed ✅
 reg-fail = Registration failed: { $error }
 
+reg-ask-birth = Please enter your date of birth.\nFormat: 01.12.2025
+reg-birth-invalid = Invalid date format. Please enter the date in DD.MM.YYYY format. For example, 12/01/2025.
+reg-birth-too-young = Requests are accepted only from clients over 18 years of age.
+reg-ask-drive-exp = Please indicate your driving experience (in years, numbers only).
+reg-drive-exp-invalid = Please enter your length of service using numbers only, without letters or other symbols.
+
 legal-offer = 📄 Public offer
 legal-privacy = 🔒 Privacy policy
 legal-agree = ✅ I agree

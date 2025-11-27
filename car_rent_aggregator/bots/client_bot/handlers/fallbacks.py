@@ -78,6 +78,28 @@ async def fb_last_name_cb(c: CallbackQuery, state: FSMContext):
     await c.message.answer(t(lang, "reg-ask-last"))
     await c.answer()
 
+@router.message(SearchStates.BIRTH_DATE)
+async def fb_birth_date_msg(m: Message, state: FSMContext):
+    lang = await _lang_for(m.from_user.id, state)
+    await m.answer(t(lang, "reg-ask-birth"))
+
+@router.callback_query(SearchStates.BIRTH_DATE)
+async def fb_birth_date_cb(c: CallbackQuery, state: FSMContext):
+    lang = await _lang_for(c.from_user.id, state)
+    await c.message.answer(t(lang, "reg-ask-birth"))
+    await c.answer()
+
+@router.message(SearchStates.DRIVE_EXP)
+async def fb_drive_exp_msg(m: Message, state: FSMContext):
+    lang = await _lang_for(m.from_user.id, state)
+    await m.answer(t(lang, "reg-ask-drive-exp"))
+
+@router.callback_query(SearchStates.DRIVE_EXP)
+async def fb_drive_exp_cb(c: CallbackQuery, state: FSMContext):
+    lang = await _lang_for(c.from_user.id, state)
+    await c.message.answer(t(lang, "reg-ask-drive-exp"))
+    await c.answer()
+
 
 # --- TERMS: показываем ещё раз клавиатуру согласия/ознакомления ---
 @router.message(SearchStates.TERMS)

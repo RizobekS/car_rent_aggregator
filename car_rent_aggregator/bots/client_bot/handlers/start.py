@@ -9,7 +9,7 @@ from bots.client_bot.poller import ensure_client_subscription
 from bots.shared.api_client import ApiClient
 from bots.shared.i18n import t, resolve_user_lang, SUPPORTED
 import re
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 
 router = Router()
@@ -160,6 +160,66 @@ async def got_last_name_show_legal(m: Message, state: FSMContext):
     if not last or len(last) < 2:
         return await m.answer(t(lang, "reg-last-short"))
     await state.update_data(last_name=last)
+    await state.set_state(SearchStates.BIRTH_DATE)
+    await m.answer(t(lang, "reg-ask-birth"))
+
+@router.message(SearchStates.BIRTH_DATE, F.text)
+async def reg_birth_date(m: Message, state: FSMContext):
+    api_lang = await resolve_user_lang(ApiClient(), m.from_user.id, await state.get_data())
+    lang = api_lang  # коротко
+
+    raw = (m.text or "").strip()
+
+    # пробуем распарсить DD.MM.YYYY
+    try:
+        bdate = datetime.strptime(raw, "%d.%m.%Y").date()
+    except ValueError:
+        await m.answer(
+            t(lang, "reg-birth-invalid")
+        )
+        return
+
+    # считаем возраст
+    today = date.today()
+    age = today.year - bdate.year - ((today.month, today.day) < (bdate.month, bdate.day))
+
+    if age < 18:
+        await m.answer(
+            t(lang, "reg-birth-too-young")
+        )
+        await state.clear()
+        return
+
+    await state.update_data(birth_date=raw)
+
+    # идём на стаж
+    await state.set_state(SearchStates.DRIVE_EXP)
+    await m.answer(
+        t(lang, "reg-ask-drive-exp")
+    )
+
+@router.message(SearchStates.DRIVE_EXP, F.text)
+async def reg_drive_exp(m: Message, state: FSMContext):
+    api = ApiClient()
+    lang = await resolve_user_lang(api, m.from_user.id, await state.get_data())
+    await api.close()
+
+    raw = (m.text or "").strip()
+
+    if not raw.isdigit():
+        await m.answer(
+            t(lang, "reg-drive-exp-invalid")
+        )
+        return
+
+    years = int(raw)
+    if years <= 0:
+        await m.answer(
+            t(lang, "reg-drive-exp-invalid")
+        )
+        return
+
+    await state.update_data(drive_exp=years)
 
     if LEGAL_OFFER_FILE.exists():
         try:
@@ -220,6 +280,8 @@ async def legal_agree_and_register(c: CallbackQuery, state: FSMContext):
         "last_name":  data.get("last_name"),
         "phone":      data.get("phone"),
         "language":   lang,
+        "birth_date": data.get("birth_date"),
+        "drive_exp": data.get("drive_exp"),
     }
 
     api = ApiClient()

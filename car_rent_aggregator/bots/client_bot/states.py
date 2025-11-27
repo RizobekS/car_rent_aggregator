@@ -5,6 +5,8 @@ class SearchStates(StatesGroup):
     PHONE = State()
     FIRST_NAME = State()
     LAST_NAME = State()
+    BIRTH_DATE = State()
+    DRIVE_EXP = State()
     TERMS = State()
 
     DATE_FROM = State()

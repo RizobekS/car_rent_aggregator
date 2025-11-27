@@ -113,6 +113,12 @@ reg-last-short = Familiya juda qisqa. Iltimos, qaytadan kiriting.
 reg-ok = Ro‘yxatdan o‘tish yakunlandi ✅
 reg-fail = Ro‘yxatdan o‘tish amalga oshmadi: { $error }
 
+reg-ask-birth = Tug'ilgan sanangizni kiriting.\nFormati: 01.12.2025
+reg-birth-invalid = Sana formati noto'g'ri. Iltimos, sanani KK.OO.YYYY formatida kiriting. Masalan, 12/01/2025.
+reg-birth-too-young = Arizalar faqat 18 yoshdan oshgan mijozlardan qabul qilinadi.
+reg-ask-drive-exp = Iltimos, haydovchilik tajribangizni ko'rsating (yillarda, faqat raqamlarda).
+reg-drive-exp-invalid = Iltimos, haydovchlik tajribangizni faqat raqamlardan foydalanib, harflar yoki boshqa belgilarsiz kiriting.
+
 legal-offer = 📄 Ommaviy oferta
 legal-privacy = 🔒 Maxfiylik siyosati
 legal-agree = ✅ Roziman

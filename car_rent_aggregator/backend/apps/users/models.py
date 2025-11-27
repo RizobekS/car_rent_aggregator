@@ -34,6 +34,8 @@ class BotUser(models.Model):
     )
     first_name = models.CharField(_("Имя"), max_length=150, blank=True)
     last_name  = models.CharField(_("Фамилия"), max_length=150, blank=True)
+    birth_date = models.DateField(_("Дата рождения"), blank=True, null=True)
+    drive_exp = models.PositiveSmallIntegerField(_("Опыт вождения"), blank=True, null=True, default=0)
     language = models.CharField(
         _("Язык интерфейса"),
         max_length=5,
