@@ -20,6 +20,22 @@ LEGAL_DIR = CLIENT_ROOT / "assets" / "legal"
 LEGAL_OFFER_FILE = LEGAL_DIR / "offer.pdf"
 LEGAL_PRIVACY_FILE = LEGAL_DIR / "privacy.pdf"
 
+async def cleanup_chat_from_message(m: Message, window: int = 30) -> None:
+    """
+    Пытаемся почистить последние window сообщений в чате.
+    Используем диапазон message_id, и игнорируем ошибки,
+    когда бот не имеет права удалить чужое сообщение.
+    """
+    chat_id = m.chat.id
+    last_id = m.message_id
+
+    for mid in range(max(1, last_id - window), last_id + 1):
+        try:
+            await m.bot.delete_message(chat_id, mid)
+        except Exception:
+            # чужие/старые сообщения просто не удалятся
+            pass
+
 # --------- Клавиатуры ---------
 def main_menu(lang: str) -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
@@ -184,10 +200,14 @@ async def reg_birth_date(m: Message, state: FSMContext):
     age = today.year - bdate.year - ((today.month, today.day) < (bdate.month, bdate.day))
 
     if age < 18:
-        await m.answer(
-            t(lang, "reg-birth-too-young")
-        )
+        await cleanup_chat_from_message(m, window=30)
+
         await state.clear()
+
+        await m.answer(
+            t(lang, "reg-birth-too-young"),
+            reply_markup=main_menu(lang),
+        )
         return
 
     await state.update_data(birth_date=raw)

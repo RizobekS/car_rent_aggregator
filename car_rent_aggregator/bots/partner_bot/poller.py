@@ -206,8 +206,7 @@ async def notify_loop(bot: Bot, chat_id: int, username: str | None):
                     chat_id,
                     f"💸 Клиент оплатил заявку #{bid}\n"
                     f"Авто: {car}\n"
-                    f"{df}–{dt}\n"
-                    f"Тип оплаты: {mode_txt}."
+                    f"{df}–{dt}"
                 )
 
         except Exception:

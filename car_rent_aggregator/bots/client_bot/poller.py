@@ -66,7 +66,39 @@ def kb_payment(lang: str):
         resize_keyboard=True
     )
 
+def kb_main_menu(lang: str) -> ReplyKeyboardMarkup:
+    """
+    Главное меню для клиента.
+    Дублируем логику из start.main_menu, но без импорт-адского круга.
+    """
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text=t(lang, "menu-find"))],
+            [KeyboardButton(text=t(lang, "menu-bookings")), KeyboardButton(text=t(lang, "menu-help"))],
+            [KeyboardButton(text=t(lang, "menu-language"))],
+        ],
+        resize_keyboard=True
+    )
 
+
+async def cleanup_chat_generic(bot: Bot, chat_id: int, window: int = 50) -> None:
+    """
+    Пытаемся почистить последние window сообщений в чате.
+    Алгоритм:
+      1) отправляем временное сообщение,
+      2) по его message_id удаляем диапазон [id - window; id].
+    """
+    try:
+        tmp = await bot.send_message(chat_id, ".")
+        last_id = tmp.message_id
+        for mid in range(max(1, last_id - window), last_id + 1):
+            try:
+                await bot.delete_message(chat_id, mid)
+            except Exception:
+                pass
+    except Exception:
+        # если что-то пошло не так – просто молча живём дальше
+        return
 
 async def _send_suggestions(
     bot: Bot,
@@ -231,6 +263,7 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                     known[bid] = state
 
                     if pm == "paid":
+                        await cleanup_chat_generic(bot, chat_id)
                         await bot.send_message(
                             chat_id,
                             t(
@@ -244,6 +277,7 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                                 partner_phone=partner_phone,
                                 partner_address=partner_address,
                             ),
+                            reply_markup=kb_main_menu(lang),
                         )
                         log.info("Booking %s for chat %s initial state %s (marker=paid)", bid, chat_id, st)
 
@@ -319,6 +353,7 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
 
                 # 1) успешная оплата — реагируем на payment_marker
                 if pm == "paid" and (prev is None or not prev.endswith("|paid")):
+                    await cleanup_chat_generic(bot, chat_id)
                     await bot.send_message(
                         chat_id,
                         t(
@@ -332,6 +367,7 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                             partner_phone=partner_phone,
                             partner_address=partner_address,
                         ),
+                        reply_markup=kb_main_menu(lang),
                     )
                 elif st == "confirmed":
                     await bot.send_message(
