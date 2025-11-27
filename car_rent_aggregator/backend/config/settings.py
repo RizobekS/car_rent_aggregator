@@ -200,11 +200,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ───────────────────────── Jazzmin ─────────────────────────
 JAZZMIN_SETTINGS = {
     # Брендинг
-    "site_title": "RentCar Admin",
-    "site_header": "Агрегатор автопроката",
-    "site_brand": "Car Hub",
+    "site_title": "TripleA CarHub",
+    "site_header": "TripleA CarHub",
+    "site_brand": "TripleA CarHub",
     "welcome_sign": "Добро пожаловать в панель управления",
-    "copyright": "© Aggregator RentCar, 2025",
+    "copyright": "© TripleA CarHub, 2025",
     "site_logo": "jazzmin/logo/site_logo.png",            # помести файл в STATIC/jazzmin/logo.svg
     "login_logo": "jazzmin/logo/aggregator_logo.png",          # STATIC/jazzmin/login.svg
     "login_logo_dark": "jazzmin/logo/aggregator_logo.png",

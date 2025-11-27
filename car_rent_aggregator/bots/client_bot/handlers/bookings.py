@@ -5,7 +5,10 @@ from datetime import datetime, timedelta, timezone as _tz
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import (
+    Message, ReplyKeyboardMarkup, KeyboardButton,
+    InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery,
+)
 
 from bots.shared.api_client import ApiClient
 from bots.shared.i18n import t, resolve_user_lang, SUPPORTED
@@ -126,53 +129,132 @@ async def my_bookings(m: Message, state: FSMContext):
 
     await m.answer(t(lang, "my-head") + "\n\n" + "\n\n".join(lines))
 
-    # предложить оплату по confirmed
+    # ---- Блок неоплаченных броней с кнопками "Оплатить" ----
     now = datetime.now(_tz.utc)
+    unpaid = []
 
     for b in items[:20]:
         st = (b.get("status") or "").lower()
         already_paid = (b.get("payment_marker") or "").lower() == "paid"
 
-        if st == "confirmed" and not already_paid:
+        if st != "confirmed" or already_paid:
+            continue
 
-            upd_iso = b.get("updated_at") or b.get("created_at")
-            try:
-                if upd_iso and upd_iso.endswith("Z"):
-                    upd_iso = upd_iso[:-1] + "+00:00"
-                updated = datetime.fromisoformat(upd_iso)
-            except Exception:
-                updated = now
+        # ограничение по времени (20 минут от обновления)
+        upd_iso = b.get("updated_at") or b.get("created_at")
+        try:
+            if upd_iso and upd_iso.endswith("Z"):
+                upd_iso = upd_iso[:-1] + "+00:00"
+            updated = datetime.fromisoformat(upd_iso)
+        except Exception:
+            updated = now
 
-            minutes_left = max(0, 20 - int((now - updated).total_seconds() // 60))
+        minutes_left = max(0, 20 - int((now - updated).total_seconds() // 60))
+        if minutes_left <= 0:
+            # бронь уже протухла для оплаты
+            continue
 
-            try:
-                from_dt = datetime.fromisoformat(b["date_from"])
-                to_dt   = datetime.fromisoformat(b["date_to"])
-                wd = float(b.get("price_weekday") or 0)
-                we = float(b.get("price_weekend") or wd)
-                days_total = (to_dt - from_dt).days
-                approx_total = 0
-                d_iter = from_dt
-                for _ in range(days_total):
-                    approx_total += we if d_iter.weekday() >= 5 else wd
-                    d_iter += timedelta(days=1)
-                approx_total = int(approx_total)
-            except Exception:
-                approx_total = 0
+        # считаем примерную сумму аренды
+        try:
+            from_dt = datetime.fromisoformat(b["date_from"])
+            to_dt = datetime.fromisoformat(b["date_to"])
+            wd = float(b.get("price_weekday") or 0)
+            we = float(b.get("price_weekend") or wd)
+            days_total = (to_dt - from_dt).days
+            approx_total = 0
+            d_iter = from_dt
+            for _ in range(days_total):
+                approx_total += we if d_iter.weekday() >= 5 else wd
+                d_iter += timedelta(days=1)
+            approx_total = int(approx_total)
+        except Exception:
+            approx_total = 0
 
-            adv_amount = int(float(b.get("advance_amount") or 0)) or None
+        adv_amount = int(float(b.get("advance_amount") or 0)) or None
 
-            text_pay = t(
-                lang,
-                "pay-choose",
-                id=b["id"],
-                amount=_fmt_int(approx_total)
-            )
-            if minutes_left:
-                text_pay += f" (⏳ {minutes_left} min)"
+        unpaid.append((b, approx_total, adv_amount, minutes_left))
 
-            sent = await m.answer(text_pay, reply_markup=None)
-            PAYMENT_MSGS.setdefault(m.from_user.id, {}).setdefault(int(b["id"]), []).append(sent.message_id)
+    if not unpaid:
+        # все брони либо оплачены, либо не подлежат оплате
+        return
+
+    # для каждой неоплаченной брони — своё сообщение + своя кнопка "Оплатить"
+    for b, approx_total, adv_amount, minutes_left in unpaid:
+        text_pay = t(
+            lang,
+            "pay-choose",
+            id=b["id"],
+            amount=_fmt_int(approx_total),
+        )
+        if minutes_left:
+            text_pay += f" (⏳ {minutes_left} min)"
+
+        kb = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text=t(lang, "menu-pay"),  # "Оплатить"
+                        callback_data=f"pay:start:{b['id']}",
+                    )
+                ]
+            ]
+        )
+
+        sent = await m.answer(text_pay, reply_markup=kb)
+        PAYMENT_MSGS.setdefault(m.from_user.id, {}).setdefault(int(b["id"]), []).append(sent.message_id)
+
+@router.callback_query(F.data.startswith("pay:start:"))
+async def cb_start_payment(c: CallbackQuery, state: FSMContext):
+    """
+    Нажали на кнопку "Оплатить" под конкретной бронью.
+    1) Достаём id брони из callback_data.
+    2) Тянем бронь с бэка.
+    3) Считаем полную сумму и аванс.
+    4) Сохраняем в FSM и запускаем сценарий выбора типа оплаты.
+    """
+    try:
+        booking_id = int(c.data.split(":")[2])
+    except (IndexError, ValueError):
+        await c.answer("Ошибка данных.", show_alert=True)
+        return
+
+    api = ApiClient()
+    lang = await resolve_user_lang(api, c.from_user.id, await state.get_data())
+
+    try:
+        booking = await api.get(f"/bookings/{booking_id}/")
+    except Exception as e:
+        await api.close()
+        await c.answer()
+        await c.message.answer(t(lang, "pay-create-error", error=str(e)))
+        return
+    finally:
+        await api.close()
+
+    # статус и маркер оплаты ещё раз на всякий случай
+    st = (booking.get("status") or "").lower()
+    paid_marker = (booking.get("payment_marker") or "").lower()
+    if st != "confirmed" or paid_marker == "paid":
+        await c.answer()
+        await c.message.answer(t(lang, "errors-missing-booking"))
+        return
+
+    full_amount = int(float(booking.get("price_quote") or 0))
+    adv_amount  = int(float(booking.get("advance_amount") or 0))
+
+    await state.update_data(
+        pending_booking_id=booking_id,
+        full_amount=full_amount,
+        adv_amount=adv_amount,
+    )
+
+    await state.set_state(PaymentStates.AWAIT_TYPE)
+
+    await c.answer()
+    await c.message.answer(
+        t(lang, "pay-choose-type"),
+        reply_markup=kb_pay_type(lang, full_amount, adv_amount),
+    )
 
 
 # =====================================================================
