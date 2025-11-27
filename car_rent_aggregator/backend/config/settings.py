@@ -145,7 +145,7 @@ BOT_PAY_RETURN_URL = os.environ.get("BOT_PAY_RETURN_URL", "https://t.me/")
 PAYTECHUZ = {
     "PAYME": {
         "PAYME_ID":        os.environ.get("PAYME_ID"),
-        "PAYME_KEY":       os.environ.get("PAYME_KEY_TEST"),
+        "PAYME_KEY":       os.environ.get("PAYME_KEY_PROD"),
 
         "ACCOUNT_MODEL":   "apps.payments.models.Payment",
         "ACCOUNT_FIELD":   "id",
