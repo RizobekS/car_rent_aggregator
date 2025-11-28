@@ -148,7 +148,7 @@ PAYTECHUZ = {
         "PAYME_KEY":       os.environ.get("PAYME_KEY_PROD"),
 
         "ACCOUNT_MODEL":   "apps.payments.models.Payment",
-        "ACCOUNT_FIELD":   "id",
+        "ACCOUNT_FIELD":   "order_id",
         "AMOUNT_FIELD":    "amount",
         "ONE_TIME_PAYMENT": True,
         "IS_TEST_MODE":    False,
