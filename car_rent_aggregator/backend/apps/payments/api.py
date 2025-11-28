@@ -88,7 +88,7 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
                 )
                 res = gw.create_payment(
                     id=payment.id,
-                    amount=int(payment.amount) * 100,  # amount в тиынах
+                    amount=int(payment.amount),
                     return_url=settings.BOT_PAY_RETURN_URL,
                 )
                 raw_meta.update({"payme_create": res} if isinstance(res, dict) else {})
