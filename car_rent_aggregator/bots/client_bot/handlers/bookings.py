@@ -493,7 +493,7 @@ async def choose_provider(m: Message, state: FSMContext):
     # очищаем состояние и возвращаем главное меню
     await state.clear()
 
-    msg = t(lang, "pay-open-link") + f"\n\n👉 [💳 Оплатить]({pay_url})"
+    msg = t(lang, "pay-open-link", pay_url=pay_url)
     await m.answer(msg, parse_mode="Markdown", reply_markup=main_menu(lang))
 
 

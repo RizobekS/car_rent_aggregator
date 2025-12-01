@@ -161,3 +161,25 @@ class SelfieUpdateView(APIView):
 
         return Response({"ok": True})
 
+
+class LanguageUpdateSerializer(serializers.Serializer):
+    tg_user_id = serializers.IntegerField()
+    language = serializers.ChoiceField(choices=[("uz", "uz"), ("ru", "ru"), ("en", "en")])
+
+
+class LanguageUpdateView(APIView):
+    permission_classes = (BotOnlyPermission,)
+
+    def post(self, request):
+        ser = LanguageUpdateSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+
+        tg = ser.validated_data["tg_user_id"]
+        lang = ser.validated_data["language"]
+
+        user, _ = BotUser.objects.get_or_create(tg_user_id=tg)
+        user.language = lang
+        user.save(update_fields=["language", "updated_at"])
+
+        return Response({"ok": True, "language": user.language}, status=status.HTTP_200_OK)
+

@@ -52,13 +52,15 @@ class CarSerializer(serializers.ModelSerializer):
     images_rel = serializers.SerializerMethodField()
     cover_url = serializers.SerializerMethodField()
     cover_rel = serializers.SerializerMethodField()
+    region = serializers.SerializerMethodField()
+    color = serializers.SerializerMethodField()
 
     class Meta:
         model = Car
         fields = (
-            "id", "partner", "partner_name",
+            "id", "partner", "partner_name", "region",
             "title", "mark", "model", "year",
-            "car_class", "gearbox",
+            "car_class", "gearbox", "plate_number",
             # новые поля
             "mileage_km", "engine_volume_l", "horsepower_hp",
             "fuel_type", "fuel_consumption_l_per_100km",
@@ -71,6 +73,27 @@ class CarSerializer(serializers.ModelSerializer):
             # медиа
             "active", "images", "images_rel", "cover_url", "cover_rel",
         )
+
+    def _get_lang(self) -> str:
+        ctx = getattr(self, "context", {}) or {}
+        return ctx.get("lang") or "ru"
+
+    def get_region(self, obj):
+        if not obj.region:
+            return None
+        lang = self._get_lang()
+        field_name = f"name_{lang}"
+        val = getattr(obj.region, field_name, None)
+        return val or obj.region.name
+
+    def get_color(self, obj):
+        if not obj.color:
+            return None
+        lang = self._get_lang()
+        field_name = f"name_{lang}"
+        val = getattr(obj.color, field_name, None)
+        return val or obj.color.name
+
 
     def _file_url(self, f):
         request = self.context.get("request")
@@ -118,6 +141,12 @@ class CarsSearchView(generics.ListAPIView):
     """
     serializer_class = CarSerializer
     permission_classes = (BotOnlyPermission,)
+
+    def get_serializer_context(self):
+        ctx = super().get_serializer_context()
+        lang = self.request.query_params.get("lang") or "ru"
+        ctx["lang"] = lang
+        return ctx
 
     def get_queryset(self):
         params = CarsSearchParamsSerializer(data=self.request.query_params)

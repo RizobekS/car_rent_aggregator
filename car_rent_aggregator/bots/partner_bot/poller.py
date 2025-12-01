@@ -144,8 +144,20 @@ async def notify_loop(bot: Bot, chat_id: int, username: str | None):
                 seen_p.add(bid)
 
                 car = b.get("car_title") or f"#{b.get('car')}"
+                plate = b.get("car_plate_number") or ""
+                region = b.get("car_region") or ""
                 df = _fmt_date(b.get("date_from", ""))
                 dt = _fmt_date(b.get("date_to", ""))
+
+                # регион + номер, если есть
+                extra_car_line = ""
+                extra_car = []
+                if region:
+                    extra_car.append(f"Регион: {region}")
+                if plate:
+                    extra_car.append(f"Госномер: {plate}")
+                if extra_car:
+                    extra_car_line = "\n" + " | ".join(extra_car)
 
                 left_min = _left_minutes(b.get("created_at"))
                 ttl_line = ""
@@ -167,6 +179,7 @@ async def notify_loop(bot: Bot, chat_id: int, username: str | None):
                 text = (
                     f"🆕 Новая заявка #{bid}\n"
                     f"Авто: {car}\n"
+                    f"{extra_car_line}\n"
                     f"{df}–{dt}"
                     f"{ttl_line}"
                     f"{client_line}"
@@ -194,6 +207,8 @@ async def notify_loop(bot: Bot, chat_id: int, username: str | None):
                 seen_paid.add(bid)
 
                 car = b.get("car_title") or f"#{b.get('car')}"
+                plate = b.get("car_plate_number") or ""
+                region = b.get("car_region") or ""
                 df = _fmt_date(b.get("date_from", ""))
                 dt = _fmt_date(b.get("date_to", ""))
                 mode = (b.get("payment_mode") or "").lower()
@@ -202,11 +217,26 @@ async def notify_loop(bot: Bot, chat_id: int, username: str | None):
                 else:
                     mode_txt = "полная оплата"
 
+                lines = [
+                    f"💸 Клиент оплатил заявку #{bid}",
+                    f"Авто: {car}",
+                ]
+
+                # регион + номер, если есть
+                extra_car = []
+                if region:
+                    extra_car.append(f"Регион: {region}")
+                if plate:
+                    extra_car.append(f"Госномер: {plate}")
+                if extra_car:
+                    lines.append(" | ".join(extra_car))
+
+                lines.append(f"{df}–{dt}")
+                lines.append(f"Тип оплаты: {mode_txt}.")
+
                 await bot.send_message(
                     chat_id,
-                    f"💸 Клиент оплатил заявку #{bid}\n"
-                    f"Авто: {car}\n"
-                    f"{df}–{dt}"
+                    "\n".join(lines),
                 )
 
         except Exception:

@@ -183,10 +183,13 @@ def build_car_caption(car: dict, lang: str) -> str:
     - лимит км и страховку
     - основные условия (возраст, стаж, паспорт)
     """
+    region = f"{car.get("region")}" if car.get("region") else ""
+    plate_number = f"{car.get("plate_number")}" if car.get("plate_number") else ""
+    color = f"{car.get("color")}" if car.get("color") else ""
     title = car.get("title") or t(lang, "card-fallback", caption="")
     year_part = f" ({car['year']})" if car.get("year") else ""
     mileage_part = f" • {fmt_int(car['mileage_km'])} km" if car.get("mileage_km") else ""
-    top = t(lang, "card-top", title=title, year_part=year_part, mileage_part=mileage_part)
+    top = t(lang, "card-top", region=region, plate_number=plate_number, title=title, year_part=year_part, mileage_part=mileage_part, color=color)
 
     # строка с классом и приводом
     class_key = {
@@ -207,14 +210,26 @@ def build_car_caption(car: dict, lang: str) -> str:
     drive_label = t(lang, drive_key) if drive_key else ""
     drive_part = f" • {t(lang, 'label-drive', value=drive_label)}" if drive_label else ""
 
+    gearbox_key = {
+        "AT": "gearbox_at",
+        "MT": "gearbox_mt",
+        "AMT": "gearbox_amt",
+        "CVT": "gearbox_cvt",
+    }.get(str(car.get("gearbox", "")).lower(), "")
+    gearbox_label = t(lang, gearbox_key) if gearbox_key else ""
+    gearbox_part = f" • {t(lang, 'label-gear', value=gearbox_label)}" if gearbox_label else ""
+
     line2 = t(
         lang,
         "card-line2",
         class_part=class_part,
         drive_part=drive_part,
+        gearbox_part=gearbox_part,
     )
 
     # третья строка: мощность, топливо, расход
+    engine_volume_l = car.get("engine_volume_l")
+    engine_volume_text = t(lang, "engine_volume_text", engine_volume_l=engine_volume_l)
     hp = car.get("horsepower_hp")
     fuel_key = {
         "petrol":   "fuel-petrol",
@@ -229,6 +244,8 @@ def build_car_caption(car: dict, lang: str) -> str:
     parts = []
     if hp:
         parts.append(f"{fmt_int(hp)} hp")
+    if engine_volume_l:
+        parts.append(engine_volume_text)
     if fuel_label:
         parts.append(fuel_label)
     if cons:
@@ -460,6 +477,7 @@ async def do_search(msg: Message, state: FSMContext, user_id: int):
     params = {
         "date_from": data.get("date_from"),
         "date_to": data.get("date_to"),
+        "lang": lang,
     }
     if data.get("car_class"):
         params["car_class"] = data["car_class"]

@@ -111,6 +111,9 @@ class BookingSerializer(serializers.ModelSerializer):
     client_selfie_url = serializers.SerializerMethodField()
 
     # раскрываем для оплат/подсказок
+    car_region = serializers.SerializerMethodField()
+    car_color = serializers.SerializerMethodField()
+    car_plate_number = serializers.CharField(source="car.plate_number", read_only=True)
     car_class      = serializers.CharField(source="car.car_class", read_only=True)
     price_weekday  = serializers.DecimalField(source="car.price_weekday", max_digits=12, decimal_places=2, read_only=True)
     price_weekend  = serializers.DecimalField(source="car.price_weekend", max_digits=12, decimal_places=2, read_only=True)
@@ -136,7 +139,7 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = (
             "id",
-            "car", "car_title", "car_class",
+            "car", "car_title", "car_class", "car_region", "car_color", "car_plate_number",
             "partner", "partner_name", "partner_phone", "partner_address",
             "client", "client_tg_user_id", "client_first_name",
             "client_last_name", "client_username",
@@ -146,6 +149,29 @@ class BookingSerializer(serializers.ModelSerializer):
             "created_at", "updated_at", "client_selfie_url", "client_birth_date",
             "client_drive_exp", "client_age_years",
         )
+
+    def _get_lang(self) -> str:
+        ctx = getattr(self, "context", {}) or {}
+        return ctx.get("lang") or "ru"
+
+    def get_car_region(self, obj):
+        car = getattr(obj, "car", None)
+        if not car or not car.region:
+            return None
+        lang = self._get_lang()
+        field_name = f"name_{lang}"
+        val = getattr(car.region, field_name, None)
+        return val or car.region.name
+
+    def get_car_color(self, obj):
+        car = getattr(obj, "car", None)
+        if not car or not car.color:
+            return None
+        lang = self._get_lang()
+        field_name = f"name_{lang}"
+        val = getattr(car.color, field_name, None)
+        return val or car.color.name
+
 
     def get_client_age_years(self, obj):
         from datetime import date

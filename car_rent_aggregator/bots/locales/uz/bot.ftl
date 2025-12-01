@@ -16,16 +16,27 @@ status-canceled = Bekor qilindi
 status-rejected = Rad etilgan
 status-expired = Muddati tugagan
 
+search-context-actions = Siz sinf yoki qidiruv sanalarini o'zgartirishingiz mumkin:
+menu-change-class = 🚗 Avtomobil sinfini o'zgartirish
+menu-change-dates = 📅 Sanani o'zgartirish
+menu-pay = 💳 To'lash
+pay-select-type = To'lov usulini tanlang
+pay-full = To'liq to'lov
+pay-advance = Avans
+pay-select-provider = To'lov tizimini tanlang
+pay-link = To'lov uchun havolaga o'ting: { $url }
+back = ◀️ Ortga
+
 client-booking-confirmed =
     ✅ Broningiz tasdiqlandi!
-    🚗 Mashina: { $title }
+    🚗 Mashina: { $title } • Rangi: { $car_color } • Avto raqami: { $car_plate_number }
     🆔 Buyurtma raqami: #{ $id }
     📅 Davr: { $date_from } – { $date_to }
     ℹ️ Tez orada siz bilan bogʻlanishlari mumkin. Iltimos, telefoningizni yoningizda saqlang.
 
 client-booking-paid =
     💳 Toʻlov muvaffaqiyatli yakunlandi!
-    🚗 Mashina: { $title }
+    🚗 Mashina: { $title } • Rangi: { $car_color } • Avto raqami: { $car_plate_number }
     🆔 Buyurtma raqami: #{ $id }
     📅 Davr: { $date_from } – { $date_to }
     👤 Hamkor: { $partner_name }
@@ -35,14 +46,14 @@ client-booking-paid =
 
 client-booking-rejected =
     ❌ Afsuski, broningiz rad etildi.
-    🚗 Mashina: { $title }
+    🚗 Mashina: { $title } • Rangi: { $car_color } • Avto raqami: { $car_plate_number }
     🆔 Buyurtma raqami: #{ $id }
     📅 Davr: { $date_from } – { $date_to }
     ℹ️ Quyida boshqa variantlarni taklif qilamiz.
 
 client-booking-expired =
     ⏳ Bronlash vaqti tugadi.
-    🚗 Mashina: { $title }
+    🚗 Mashina: { $title } • Rangi: { $car_color } • Avto raqami: { $car_plate_number }
     🆔 Buyurtma raqami: #{ $id }
     📅 Davr: { $date_from } – { $date_to }
     ℹ️ Tasdiqlanmaganligi sababli bron avtomatik ravishda bekor qilindi. Siz uchun oʻxshash variantlarni tanlab beramiz.
@@ -152,19 +163,9 @@ class-suv = Yo‘l tanlamas
 class-minivan = Miniven
 back-to-dates = « Sanalarga qaytish
 
-card-top =
-    🚗 { $title }{ $year ->
-        [has]  ({ $y })
-       *[no]
-    }{ $mileage ->
-        [has]  • Yurgani: { $km } km
-       *[no]
-    }
-card-line2 =
-    ⚙️ Klass: { $_class }{ $drive ->
-        [has]  • Privod: { $drive_2 }
-       *[no]
-    }
+card-top = Region: { $region }\nAvtomobol raqami: { $plate_number }\n🚗 { $title }{ $year_part }{ $mileage_part } • Rangi: { $color }
+card-line2 = ⚙️ { $class_part }{ $drive_part }{ $gearbox_part }
+engine_volume_text = dvigatel hajmi: { $engine_volume_l }
 card-price = 🗓 Ish kunlari: { $wd } so‘m/sutka\n📅 Dam olish kunlari: { $we } so‘m/sutka
 card-terms = 💳 Garov: { $deposit }\n💳 Oldindan to'lov: { $advance }\n✒️ Kunlik limit: { $limit } km/sutka\n🛡️ Sug‘urta: { $ins }
 card-options-title = 🎁 Opsiyalar:
@@ -175,10 +176,16 @@ card-fallback = { $caption }
 card-age = Mijoz yoshi: { $age } yoshdan boshlab
 card-drive-exp = Haydash tajribasi: {$years} yildan boshlab
 card-passport-required = Talab qilinadi: pasport yoki shaxsni tasdiqlovchi hujjat
+label-gear = Transmissiya: { $value }
 
 drive-fwd = Oldingi
 drive-rwd = Orqa
 drive-awd = To‘liq
+
+gearbox_at = Avtomat
+gearbox_mt = Mexanika
+gearbox_amt = Robot
+gearbox_cvt = Variator
 
 fuel-petrol = Benzin
 fuel-diesel = Dizel
@@ -247,13 +254,13 @@ my-line = #{ $id } • { $title } • { $status }\n{ $from_ } → { $to }
 
 status-paid = ✅ #{id} ("{$title}") so'rovi uchun to'lov qabul qilindi. Rahmat!
 
-pay-mode-full = 💳 To‘liq to‘lov ({amount} so‘m)
-pay-mode-adv = 🔖 Oldindan to‘lov ({amount} so‘m)
+pay-mode-full = 💳 To‘liq to‘lov ({ $amount } so‘m)
+pay-mode-adv = 🔖 Oldindan to‘lov ({ $amount } so‘m)
 
 pay-choose-type = 💰 To‘lov turini tanlang:
 pay-choose-provider = 💳 To‘lov tizimini tanlang:
 
-pay-open-link = 🔗 To‘lovni amalga oshirish uchun quyidagi havolani bosing:
+pay-open-link = 🔗 To‘lovni amalga oshirish uchun quyidagi havolani bosing:\n\n👉 [💳 To'lash]({ $pay_url})
 pay-amount-zero = ⚠️ To‘lov yaratilmaydi: summa 0 ga teng.
 
 pay-choose-full = To‘liq to‘lov uchun to‘lov tizimini tanlang:

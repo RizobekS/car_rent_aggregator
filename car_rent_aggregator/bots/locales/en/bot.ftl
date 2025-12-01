@@ -18,16 +18,27 @@ status-canceled = Canceled
 status-rejected = Rejected
 status-expired = Expired
 
+search-context-actions = You can change the class or search dates:
+menu-change-class = 🚗 Change car class
+menu-change-dates = 📅 Change dates
+menu-pay = 💳 Pay
+pay-select-type = Select a payment method
+pay-full = Full payment
+pay-advance = Advance
+pay-select-provider = Select a payment system
+pay-link = Follow the link to pay: { $url }
+back = ◀️ Back
+
 client-booking-confirmed =
     ✅ Your booking has been confirmed!
-    🚗 Car: { $title }
+    🚗 Car: { $title } • Color: { $car_color } • Plate number: { $car_plate_number }
     🆔 Booking ID: #{ $id }
     📅 Period: { $date_from } – { $date_to }
     ℹ️ The partner may contact you to clarify details. Please keep your phone available.
 
 client-booking-paid =
     💳 Payment completed successfully!
-    🚗 Car: { $title }
+    🚗 Car: { $title } • Color: { $car_color } • Plate number: { $car_plate_number }
     🆔 Booking ID: #{ $id }
     📅 Period: { $date_from } – { $date_to }
     👤 Partner: { $partner_name }
@@ -37,14 +48,14 @@ client-booking-paid =
 
 client-booking-rejected =
     ❌ Unfortunately, your booking request was rejected.
-    🚗 Car: { $title }
+    🚗 Car: { $title } • Color: { $car_color } • Plate number: { $car_plate_number }
     🆔 Booking ID: #{ $id }
     📅 Period: { $date_from } – { $date_to }
     ℹ️ The car is not available for these dates. We’ve selected some similar options for you below.
 
 client-booking-expired =
     ⏳ Booking hold time has expired.
-    🚗 Car: { $title }
+    🚗 Car: { $title } • Color: { $car_color } • Plate number: { $car_plate_number }
     🆔 Booking ID: #{ $id }
     📅 Period: { $date_from } – { $date_to }
     ℹ️ The request was automatically cancelled because it wasn’t confirmed in time. We’ll show you similar cars for these dates.
@@ -152,8 +163,9 @@ class-suv = SUV
 class-minivan = Minivan
 back-to-dates = « Back to dates
 
-card-top = 🚗 { $title }{ $year_part }{ $mileage_part }
-card-line2 = ⚙️ { $class_part }{ $drive_part }
+card-top = Region: { $region }\nPlate number: { $plate_number }\n🚗 { $title }{ $year_part }{ $mileage_part } • Color: { $color }
+card-line2 = ⚙️ { $class_part }{ $drive_part }{ $gearbox_part }
+engine_volume_text = engine displacement: { $engine_volume_l }
 card-price = 🗓 Weekdays: { $wd } UZS/day\n📅 Weekends: { $we } UZS/day
 card-terms = 💳 Deposit: { $deposit }\n💳 Advance: { $advance }\n✒️ Mileage limit: { $limit } km/day\n🛡️ Insurance: { $ins }
 card-options-title = 🎁 Options:
@@ -164,10 +176,16 @@ card-fallback = { $caption }
 card-age = Client age: from { $age } years
 card-drive-exp = Driving experience: from { $years } years
 card-passport-required = Required: passport or ID card
+label-gear = Transmission: { $value }
 
 drive-fwd = FWD
 drive-rwd = RWD
 drive-awd = AWD
+
+gearbox_at = Automatic
+gearbox_mt = Manual
+gearbox_amt = Robotized
+gearbox_cvt = CVT
 
 fuel-petrol = Petrol
 fuel-diesel = Diesel
@@ -243,7 +261,7 @@ pay-mode-adv = 🔖 Advance payment ({ $amount } UZS)
 pay-choose-type = 💰 Select payment type:
 pay-choose-provider = 💳 Select a payment system:
 
-pay-open-link = 🔗 Click the link below to proceed with the payment:
+pay-open-link = 🔗 Click the link below to proceed with the payment:\n\n👉 [💳 Pay]({ $pay_url})
 pay-amount-zero = ⚠️ Cannot create payment: amount is zero.
 
 pay-choose-full = Choose a payment provider for full payment:

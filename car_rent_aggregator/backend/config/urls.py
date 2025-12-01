@@ -10,7 +10,7 @@ from apps.bookings.api import BookingViewSet
 from apps.payments.api import PaymentViewSet
 from apps.payments.views import PaymentRedirectView
 from apps.cars.api import CarsSearchView
-from apps.users.api import RegisterView, CheckView, SelfieUpdateView
+from apps.users.api import RegisterView, CheckView, SelfieUpdateView, LanguageUpdateView
 from apps.partners.api import PartnerLinkView
 from apps.payments.webhooks import PaymeWebhookView, ClickWebhookView
 
@@ -38,6 +38,7 @@ urlpatterns = [
                       path("users/selfie/", SelfieUpdateView.as_view(), name="users-selfie"),
                       path("users/check/", CheckView.as_view()),
                       path("partners/link/", PartnerLinkView.as_view(), name="partners-link"),
+                      path("users/set-language/", LanguageUpdateView.as_view()),
                       # ⬇️ Вебхуки PayTechUZ — по одному URL без action:
                       path("payments/payme/webhook/", PaymeWebhookView.as_view(), name="payme-webhook"),
                       path("payments/click/webhook/", ClickWebhookView.as_view(), name="click-webhook"),

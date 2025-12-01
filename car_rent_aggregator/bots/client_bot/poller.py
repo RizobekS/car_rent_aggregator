@@ -246,6 +246,9 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                 state = f"{st}|{pm}"
                 prev = known.get(bid)
                 title = b.get("car_title") or b.get("car") or "—"
+                car_color = b.get("car_color")
+                car_region = b.get("car_region")
+                car_plate_number = b.get("car_plate_number")
                 dfrom_iso = b.get("date_from", "")
                 dto_iso = b.get("date_to", "")
                 dfrom = _fmt_date(dfrom_iso)
@@ -271,6 +274,9 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                                 "client-booking-paid",
                                 id=bid,
                                 title=title,
+                                car_color = car_color,
+                                car_region = car_region,
+                                car_plate_number = car_plate_number,
                                 date_from=dfrom,
                                 date_to=dto,
                                 partner_name=partner_name,
@@ -289,6 +295,9 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                                 "client-booking-confirmed",
                                 id=bid,
                                 title=title,
+                                car_color=car_color,
+                                car_region=car_region,
+                                car_plate_number=car_plate_number,
                                 date_from=dfrom,
                                 date_to=dto,
                             ),
@@ -304,6 +313,9 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                                 "client-booking-rejected",
                                 id=bid,
                                 title=title,
+                                car_color=car_color,
+                                car_region=car_region,
+                                car_plate_number=car_plate_number,
                                 date_from=dfrom,
                                 date_to=dto,
                             ),
@@ -327,6 +339,9 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                                 "client-booking-expired",
                                 id=bid,
                                 title=title,
+                                car_color=car_color,
+                                car_region=car_region,
+                                car_plate_number=car_plate_number,
                                 date_from=dfrom,
                                 date_to=dto,
                             ),
@@ -361,6 +376,9 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                             "client-booking-paid",
                             id=bid,
                             title=title,
+                            car_color=car_color,
+                            car_region=car_region,
+                            car_plate_number=car_plate_number,
                             date_from=dfrom,
                             date_to=dto,
                             partner_name=partner_name,
@@ -377,6 +395,9 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                             "client-booking-confirmed",
                             id=bid,
                             title=title,
+                            car_color=car_color,
+                            car_region=car_region,
+                            car_plate_number=car_plate_number,
                             date_from=dfrom,
                             date_to=dto,
                         ),
@@ -393,6 +414,9 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                             "client-booking-rejected",
                             id=bid,
                             title=title,
+                            car_color=car_color,
+                            car_region=car_region,
+                            car_plate_number=car_plate_number,
                             date_from=dfrom,
                             date_to=dto,
                         ),
@@ -417,6 +441,9 @@ async def client_notify_loop(bot: Bot, chat_id: int) -> None:
                             "client-booking-expired",
                             id=bid,
                             title=title,
+                            car_color=car_color,
+                            car_region=car_region,
+                            car_plate_number=car_plate_number,
                             date_from=dfrom,
                             date_to=dto,
                         ),

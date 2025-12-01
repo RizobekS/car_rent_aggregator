@@ -124,6 +124,19 @@ async def set_language(c: CallbackQuery, state: FSMContext):
     lang = c.data.split(":")[2]  # uz|ru|en
     await state.update_data(selected_lang=lang)
 
+    # синхронизируем язык с backend'ом
+    api = ApiClient()
+    try:
+        await api.post("/users/set-language/", json={
+            "tg_user_id": c.from_user.id,
+            "language": lang,
+        })
+    except Exception:
+        # если апи упало — не роняем бота, просто работаем дальше с FSM
+        pass
+    finally:
+        await api.close()
+
     await c.message.answer(
         t(lang, "lang-set-ok", done=lang, menu_find=t(lang, "menu-find")),
         reply_markup=main_menu(lang)
