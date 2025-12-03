@@ -163,9 +163,10 @@ class-suv = Yo‘l tanlamas
 class-minivan = Miniven
 back-to-dates = « Sanalarga qaytish
 
-card-top = Region: { $region }\nAvtomobol raqami: { $plate_number }\n🚗 { $title }{ $year_part }{ $mileage_part } • Rangi: { $color }
+card-top = Region: { $region }\nAvtomobol raqami: { $plate_number }\n🚗 { $title }{ $year_part } • Yurgan masofasi:{ $mileage_part } km • Rangi: { $color }
 card-line2 = ⚙️ { $class_part }{ $drive_part }{ $gearbox_part }
 engine_volume_text = dvigatel hajmi: { $engine_volume_l }
+fuel_cons_text = Yoqilg'i sarfi: { $cons } l/100 km
 card-price = 🗓 Ish kunlari: { $wd } so‘m/sutka\n📅 Dam olish kunlari: { $we } so‘m/sutka
 card-terms = 💳 Garov: { $deposit }\n💳 Oldindan to'lov: { $advance }\n✒️ Kunlik limit: { $limit } km/sutka\n🛡️ Sug‘urta: { $ins }
 card-options-title = 🎁 Opsiyalar:

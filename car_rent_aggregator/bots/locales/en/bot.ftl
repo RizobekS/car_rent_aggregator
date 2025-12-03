@@ -163,9 +163,10 @@ class-suv = SUV
 class-minivan = Minivan
 back-to-dates = « Back to dates
 
-card-top = Region: { $region }\nPlate number: { $plate_number }\n🚗 { $title }{ $year_part }{ $mileage_part } • Color: { $color }
+card-top = Region: { $region }\nPlate number: { $plate_number }\n🚗 { $title }{ $year_part } • Mileage:{ $mileage_part } km • Color: { $color }
 card-line2 = ⚙️ { $class_part }{ $drive_part }{ $gearbox_part }
 engine_volume_text = engine displacement: { $engine_volume_l }
+fuel_cons_text = Fuel consumption: { $cons } l/100 km
 card-price = 🗓 Weekdays: { $wd } UZS/day\n📅 Weekends: { $we } UZS/day
 card-terms = 💳 Deposit: { $deposit }\n💳 Advance: { $advance }\n✒️ Mileage limit: { $limit } km/day\n🛡️ Insurance: { $ins }
 card-options-title = 🎁 Options:

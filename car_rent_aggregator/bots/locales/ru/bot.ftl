@@ -171,9 +171,10 @@ class-minivan = Минивэн
 back-to-dates = « Назад к датам
 
 # === car card ===
-card-top = Регион: { $region }\nНомер автомобиля: { $plate_number }\n🚗 { $title }{ $year_part }{ $mileage_part } • Цвет: { $color }
+card-top = Регион: { $region }\nНомер автомобиля: { $plate_number }\n🚗 { $title }{ $year_part } • Пробег:{ $mileage_part } км • Цвет: { $color }
 card-line2 = ⚙️ { $class_part }{ $drive_part }{ $gearbox_part }
 engine_volume_text = объём двигателя: { $engine_volume_l }
+fuel_cons_text = Расход топлива: { $cons } л/100 км
 card-price = 🗓 Будни: { $wd } сум/сутки\n📅 Выходные: { $we } сум/сутки
 card-terms = 💳 Депозит: { $deposit }\n💳 Аванс: { $advance }\n✒️ Лимит пробега: { $limit } км/сутки\n🛡️ Страховка: { $ins }
 card-options-title = 🎁 Опции:

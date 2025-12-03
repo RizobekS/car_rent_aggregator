@@ -188,7 +188,7 @@ def build_car_caption(car: dict, lang: str) -> str:
     color = f"{car.get("color")}" if car.get("color") else ""
     title = car.get("title") or t(lang, "card-fallback", caption="")
     year_part = f" ({car['year']})" if car.get("year") else ""
-    mileage_part = f" • {fmt_int(car['mileage_km'])} km" if car.get("mileage_km") else ""
+    mileage_part = f" {fmt_int(car['mileage_km'])}" if car.get("mileage_km") else ""
     top = t(lang, "card-top", region=region, plate_number=plate_number, title=title, year_part=year_part, mileage_part=mileage_part, color=color)
 
     # строка с классом и приводом
@@ -240,6 +240,7 @@ def build_car_caption(car: dict, lang: str) -> str:
     }.get(str(car.get("fuel_type", "")).lower(), "")
     fuel_label = t(lang, fuel_key) if fuel_key else ""
     cons = car.get("fuel_consumption_l_per_100km")
+    cons_text = t(lang, "fuel_cons_text", cons=cons)
 
     parts = []
     if hp:
@@ -249,7 +250,7 @@ def build_car_caption(car: dict, lang: str) -> str:
     if fuel_label:
         parts.append(fuel_label)
     if cons:
-        parts.append(f"{cons} L/100 km")
+        parts.append(cons_text)
     line3 = ("⛽ " + " • ".join(parts)) if parts else ""
 
     # блок с ценой
